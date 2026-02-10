@@ -14,12 +14,6 @@
                                :placeholder="$tc('worldline.support-form.description-default')">
                 <template v-slot:label>{{ $tc('worldline.support-form.description') }}</template>
             </sw-textarea-field>
-            <div class="support-form--account">
-                <sw-checkbox-field v-model:value="createAccountCheck" :disabled="createUserFormIsDisabled" :label="$tc('worldline.support-form.create-account')"></sw-checkbox-field>
-                <sw-help-text :width="200" tooltipPosition="top" :showDelay="100" :hideDelay="100"
-                              :text="createUserHelpText">
-                </sw-help-text>
-            </div>
             <div class="support-form--logs">
                 <sw-checkbox-field v-model:value="attachLogCheck" :label="$tc('worldline.support-form.attach-logs')"></sw-checkbox-field>
                 <sw-button @click="downloadLog" size="small">{{ $tc('worldline.support-form.download') }}</sw-button>

@@ -54,7 +54,6 @@
         "maxAmountExceeded": "Maximum amount exceeded.",
         "wrongAmountRequested": "Wrong amount requested.",
         "gettingPaymentDetails": "Getting payment details",
-        "paymentStatusIs": "Payment status is",
         "paymentOpen": "Payment is open",
         "paymentInProgress": "Payment is in progress",
         "paymentPaid": "Paid",
@@ -166,17 +165,14 @@
             "name": "Contact development team",
             "top-description": "Please use this form to briefly describe your inquiry and send it to our development team.",
             "attach-logs": "Attach log",
-            "create-account": "Create account",
-            "create-account-help": "Create Shopware backend account for Mediaopt support",
             "contact-email": "Your contact email",
             "description": "Description",
-            "description-default": "Dear Mediaopt support,\n\nWe would like to offer the following recommendations to improve the functionality and user experience of your plugin.\n\nKind regards,\nShop Manager",
+            "description-default": "Dear team,\n\nWe would like to offer the following recommendations to improve the functionalities and/or user experience of your integration.\n\nKind regards,",
             "button": "Send",
             "download": "Download",
             "title": "Support request",
             "success": "Successfully sent!",
-            "error": "Error!",
-            "user-have-no-rights": "Looks like you don’t have permission to create a support account. Reach out to an administrator to gain access."
+            "error": "Error!"
         },
         "custom-messages": {
             "twintPartialCaptureWarning": "Please avoid to make partial capture requests with Twint!"
