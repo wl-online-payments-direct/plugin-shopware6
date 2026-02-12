@@ -21,8 +21,6 @@ class SessionTest extends ClientTestCase
      */
     public function testCreateSession()
     {
-        $this->expectNotToPerformAssertions();
-
         $client = $this->getClient();
         $merchantId = $this->getMerchantId();
         $sessionRequest = new SessionRequest();

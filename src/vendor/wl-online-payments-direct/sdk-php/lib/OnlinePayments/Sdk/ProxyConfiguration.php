@@ -58,7 +58,7 @@ class ProxyConfiguration
      */
     public function getCurlProxyUserPwd()
     {
-        if (!is_null($this->username)) {
+        if (!is_null($this->host)) {
             return ((string)$this->username) . (is_null($this->password) ? '' : ':' . (string)$this->password);
         }
         return '';

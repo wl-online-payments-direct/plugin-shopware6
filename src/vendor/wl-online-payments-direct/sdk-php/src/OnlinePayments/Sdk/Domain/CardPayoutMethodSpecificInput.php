@@ -27,11 +27,6 @@ class CardPayoutMethodSpecificInput extends DataObject
     /**
      * @var string
      */
-    private $payoutReason;
-
-    /**
-     * @var string
-     */
     private $token;
 
     // Methods
@@ -68,21 +63,6 @@ class CardPayoutMethodSpecificInput extends DataObject
     /**
      * @return string
      */
-    public function getPayoutReason()
-    {
-        return $this->payoutReason;
-    }
-    /**
-     * @var string
-     */
-    public function setPayoutReason($value)
-    {
-        $this->payoutReason = $value;
-    }
-
-    /**
-     * @return string
-     */
     public function getToken()
     {
         return $this->token;
@@ -107,9 +87,6 @@ class CardPayoutMethodSpecificInput extends DataObject
         if ($this->paymentProductId !== null) {
             $object->paymentProductId = $this->paymentProductId;
         }
-        if ($this->payoutReason !== null) {
-            $object->payoutReason = $this->payoutReason;
-        }
         if ($this->token !== null) {
             $object->token = $this->token;
         }
@@ -133,9 +110,6 @@ class CardPayoutMethodSpecificInput extends DataObject
         }
         if (property_exists($object, 'paymentProductId')) {
             $this->paymentProductId = $object->paymentProductId;
-        }
-        if (property_exists($object, 'payoutReason')) {
-            $this->payoutReason = $object->payoutReason;
         }
         if (property_exists($object, 'token')) {
             $this->token = $object->token;

@@ -155,17 +155,9 @@ Component.register('mo-orders-unprocessed', {
                 .then((res) => {
                     if (res.success) {
                         this.transactionSuccess.capture = true;
-                        let timeout = 1000;
-                        if (res.warning) {
-                            timeout = 5000;
-                            this.createNotificationWarning({
-                                title: this.$tc('worldline.capture-payment-button.title'),
-                                message: this.$tc('worldline.capture-payment-button.success') + "\n" + res.message
-                            });
-                        }
                         setTimeout(() => {
                             location.reload();
-                        }, timeout);
+                        }, 1000);
                     } else {
                         this.createNotificationError({
                             title: this.$tc('worldline.capture-payment-button.title'),

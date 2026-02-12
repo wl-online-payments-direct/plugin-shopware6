@@ -20,14 +20,11 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Shopware\Core\Framework\Script\Execution\ScriptExecutor;
 
 class OverwriteCachedPaymentMethodRoute extends CachedPaymentMethodRoute
 {
     private SalesChannelRepository $paymentMethodsRepository;
     private EntityRepository $customerRepository;
-    private ScriptExecutor $scriptExecutor;
-    private EventDispatcherInterface $dispatcher;
 
     /**
      * @param AbstractPaymentMethodRoute $decorated
@@ -38,7 +35,6 @@ class OverwriteCachedPaymentMethodRoute extends CachedPaymentMethodRoute
      * @param array $states
      * @param SalesChannelRepository $paymentMethodsRepository
      * @param EntityRepository $customerRepository
-     * @param ScriptExecutor $scriptExecutor
      */
     public function __construct(
         AbstractPaymentMethodRoute      $decorated,
@@ -48,15 +44,12 @@ class OverwriteCachedPaymentMethodRoute extends CachedPaymentMethodRoute
         EventDispatcherInterface        $dispatcher,
         array                           $states,
         SalesChannelRepository          $paymentMethodsRepository,
-        EntityRepository                $customerRepository,
-        ScriptExecutor                  $scriptExecutor
+        EntityRepository                $customerRepository
     )
     {
         parent::__construct($decorated, $cache, $generator, $tracer, $dispatcher, $states);
         $this->paymentMethodsRepository = $paymentMethodsRepository;
         $this->customerRepository = $customerRepository;
-        $this->scriptExecutor = $scriptExecutor;
-        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -74,8 +67,6 @@ class OverwriteCachedPaymentMethodRoute extends CachedPaymentMethodRoute
             if (!is_null($fields) && array_key_exists($key, $fields) && !empty($fields[$key])) {
                 $paymentMethodRoute = new OverwritePaymentMethodRoute(
                     $this->paymentMethodsRepository,
-                    $this->dispatcher,
-                    $this->scriptExecutor,
                     $this->customerRepository
                 );
                 return $paymentMethodRoute->load($request, $context, $criteria);

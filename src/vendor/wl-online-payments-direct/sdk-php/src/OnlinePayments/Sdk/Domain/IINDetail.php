@@ -15,11 +15,6 @@ class IINDetail extends DataObject
 {
     // Properties
     /**
-     * @var string
-     */
-    private $cardType;
-
-    /**
      * @var bool
      */
     private $isAllowedInContext;
@@ -30,21 +25,6 @@ class IINDetail extends DataObject
     private $paymentProductId;
 
     // Methods
-    /**
-     * @return string
-     */
-    public function getCardType()
-    {
-        return $this->cardType;
-    }
-    /**
-     * @var string
-     */
-    public function setCardType($value)
-    {
-        $this->cardType = $value;
-    }
-
     /**
      * @return bool
      */
@@ -81,9 +61,6 @@ class IINDetail extends DataObject
     public function toObject()
     {
         $object = parent::toObject();
-        if ($this->cardType !== null) {
-            $object->cardType = $this->cardType;
-        }
         if ($this->isAllowedInContext !== null) {
             $object->isAllowedInContext = $this->isAllowedInContext;
         }
@@ -101,9 +78,6 @@ class IINDetail extends DataObject
     public function fromObject($object)
     {
         parent::fromObject($object);
-        if (property_exists($object, 'cardType')) {
-            $this->cardType = $object->cardType;
-        }
         if (property_exists($object, 'isAllowedInContext')) {
             $this->isAllowedInContext = $object->isAllowedInContext;
         }

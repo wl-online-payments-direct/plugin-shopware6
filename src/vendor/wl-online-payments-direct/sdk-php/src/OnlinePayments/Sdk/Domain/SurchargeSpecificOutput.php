@@ -24,11 +24,6 @@ class SurchargeSpecificOutput extends DataObject
      */
     private $surchargeAmount;
 
-    /**
-     * @var SurchargeRate
-     */
-    private $surchargeRate;
-
     // Methods
     /**
      * @return string
@@ -61,21 +56,6 @@ class SurchargeSpecificOutput extends DataObject
     }
 
     /**
-     * @return SurchargeRate
-     */
-    public function getSurchargeRate()
-    {
-        return $this->surchargeRate;
-    }
-    /**
-     * @var SurchargeRate
-     */
-    public function setSurchargeRate($value)
-    {
-        $this->surchargeRate = $value;
-    }
-
-    /**
      * @return object
      */
     public function toObject()
@@ -86,9 +66,6 @@ class SurchargeSpecificOutput extends DataObject
         }
         if ($this->surchargeAmount !== null) {
             $object->surchargeAmount = $this->surchargeAmount->toObject();
-        }
-        if ($this->surchargeRate !== null) {
-            $object->surchargeRate = $this->surchargeRate->toObject();
         }
         return $object;
     }
@@ -110,13 +87,6 @@ class SurchargeSpecificOutput extends DataObject
             }
             $value = new AmountOfMoney();
             $this->surchargeAmount = $value->fromObject($object->surchargeAmount);
-        }
-        if (property_exists($object, 'surchargeRate')) {
-            if (!is_object($object->surchargeRate)) {
-                throw new UnexpectedValueException('value \'' . print_r($object->surchargeRate, true) . '\' is not an object');
-            }
-            $value = new SurchargeRate();
-            $this->surchargeRate = $value->fromObject($object->surchargeRate);
         }
         return $this;
     }

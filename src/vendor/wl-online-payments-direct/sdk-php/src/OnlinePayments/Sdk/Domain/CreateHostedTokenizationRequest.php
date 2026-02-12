@@ -20,19 +20,9 @@ class CreateHostedTokenizationRequest extends DataObject
     private $askConsumerConsent;
 
     /**
-     * @var CreditCardSpecificInputHostedTokenization
-     */
-    private $creditCardSpecificInput;
-
-    /**
      * @var string
      */
     private $locale;
-
-    /**
-     * @var PaymentProductFiltersHostedTokenization
-     */
-    private $paymentProductFilters;
 
     /**
      * @var string
@@ -61,21 +51,6 @@ class CreateHostedTokenizationRequest extends DataObject
     }
 
     /**
-     * @return CreditCardSpecificInputHostedTokenization
-     */
-    public function getCreditCardSpecificInput()
-    {
-        return $this->creditCardSpecificInput;
-    }
-    /**
-     * @var CreditCardSpecificInputHostedTokenization
-     */
-    public function setCreditCardSpecificInput($value)
-    {
-        $this->creditCardSpecificInput = $value;
-    }
-
-    /**
      * @return string
      */
     public function getLocale()
@@ -88,21 +63,6 @@ class CreateHostedTokenizationRequest extends DataObject
     public function setLocale($value)
     {
         $this->locale = $value;
-    }
-
-    /**
-     * @return PaymentProductFiltersHostedTokenization
-     */
-    public function getPaymentProductFilters()
-    {
-        return $this->paymentProductFilters;
-    }
-    /**
-     * @var PaymentProductFiltersHostedTokenization
-     */
-    public function setPaymentProductFilters($value)
-    {
-        $this->paymentProductFilters = $value;
     }
 
     /**
@@ -144,14 +104,8 @@ class CreateHostedTokenizationRequest extends DataObject
         if ($this->askConsumerConsent !== null) {
             $object->askConsumerConsent = $this->askConsumerConsent;
         }
-        if ($this->creditCardSpecificInput !== null) {
-            $object->creditCardSpecificInput = $this->creditCardSpecificInput->toObject();
-        }
         if ($this->locale !== null) {
             $object->locale = $this->locale;
-        }
-        if ($this->paymentProductFilters !== null) {
-            $object->paymentProductFilters = $this->paymentProductFilters->toObject();
         }
         if ($this->tokens !== null) {
             $object->tokens = $this->tokens;
@@ -173,22 +127,8 @@ class CreateHostedTokenizationRequest extends DataObject
         if (property_exists($object, 'askConsumerConsent')) {
             $this->askConsumerConsent = $object->askConsumerConsent;
         }
-        if (property_exists($object, 'creditCardSpecificInput')) {
-            if (!is_object($object->creditCardSpecificInput)) {
-                throw new UnexpectedValueException('value \'' . print_r($object->creditCardSpecificInput, true) . '\' is not an object');
-            }
-            $value = new CreditCardSpecificInputHostedTokenization();
-            $this->creditCardSpecificInput = $value->fromObject($object->creditCardSpecificInput);
-        }
         if (property_exists($object, 'locale')) {
             $this->locale = $object->locale;
-        }
-        if (property_exists($object, 'paymentProductFilters')) {
-            if (!is_object($object->paymentProductFilters)) {
-                throw new UnexpectedValueException('value \'' . print_r($object->paymentProductFilters, true) . '\' is not an object');
-            }
-            $value = new PaymentProductFiltersHostedTokenization();
-            $this->paymentProductFilters = $value->fromObject($object->paymentProductFilters);
         }
         if (property_exists($object, 'tokens')) {
             $this->tokens = $object->tokens;

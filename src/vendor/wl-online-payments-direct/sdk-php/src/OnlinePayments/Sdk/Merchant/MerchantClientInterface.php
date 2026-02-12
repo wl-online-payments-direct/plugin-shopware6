@@ -8,7 +8,6 @@ namespace OnlinePayments\Sdk\Merchant;
 use OnlinePayments\Sdk\Merchant\HostedCheckout\HostedCheckoutClientInterface;
 use OnlinePayments\Sdk\Merchant\HostedTokenization\HostedTokenizationClientInterface;
 use OnlinePayments\Sdk\Merchant\Mandates\MandatesClientInterface;
-use OnlinePayments\Sdk\Merchant\PaymentLinks\PaymentLinksClientInterface;
 use OnlinePayments\Sdk\Merchant\Payments\PaymentsClientInterface;
 use OnlinePayments\Sdk\Merchant\Payouts\PayoutsClientInterface;
 use OnlinePayments\Sdk\Merchant\ProductGroups\ProductGroupsClientInterface;
@@ -39,13 +38,6 @@ interface MerchantClientInterface
      * @return MandatesClientInterface
      */
     public function mandates();
-
-    /**
-     * ApiResource /v2/{merchantId}/paymentlinks
-     *
-     * @return PaymentLinksClientInterface
-     */
-    public function paymentLinks();
 
     /**
      * ApiResource /v2/{merchantId}/payments

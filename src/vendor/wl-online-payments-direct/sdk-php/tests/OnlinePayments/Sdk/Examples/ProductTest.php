@@ -23,8 +23,6 @@ class ProductTest extends ClientTestCase
      */
     public function testRetrievePaymentProducts()
     {
-        $this->expectNotToPerformAssertions();
-
         $client = $this->getClient();
         $merchantId = $this->getMerchantId();
 
@@ -46,8 +44,6 @@ class ProductTest extends ClientTestCase
      */
     public function testRetrievePaymentProductsMultipleHide()
     {
-        $this->expectNotToPerformAssertions();
-
         $client = $this->getClient();
         $merchantId = $this->getMerchantId();
 
@@ -70,8 +66,6 @@ class ProductTest extends ClientTestCase
      */
     public function testRetrievePaymentProductFields()
     {
-        $this->expectNotToPerformAssertions();
-
         $client = $this->getClient();
         $merchantId = $this->getMerchantId();
 
@@ -93,8 +87,6 @@ class ProductTest extends ClientTestCase
      */
     public function testRetrievePaymentProductDirectory()
     {
-        $this->expectNotToPerformAssertions();
-
         $client = $this->getClient();
         $merchantId = $this->getMerchantId();
         $getParams = new GetProductDirectoryParams();

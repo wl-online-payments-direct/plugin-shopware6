@@ -27,11 +27,6 @@ class AddressPersonal extends DataObject
     /**
      * @var string
      */
-    private $companyName;
-
-    /**
-     * @var string
-     */
     private $countryCode;
 
     /**
@@ -88,21 +83,6 @@ class AddressPersonal extends DataObject
     public function setCity($value)
     {
         $this->city = $value;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCompanyName()
-    {
-        return $this->companyName;
-    }
-    /**
-     * @var string
-     */
-    public function setCompanyName($value)
-    {
-        $this->companyName = $value;
     }
 
     /**
@@ -207,9 +187,6 @@ class AddressPersonal extends DataObject
         if ($this->city !== null) {
             $object->city = $this->city;
         }
-        if ($this->companyName !== null) {
-            $object->companyName = $this->companyName;
-        }
         if ($this->countryCode !== null) {
             $object->countryCode = $this->countryCode;
         }
@@ -244,9 +221,6 @@ class AddressPersonal extends DataObject
         }
         if (property_exists($object, 'city')) {
             $this->city = $object->city;
-        }
-        if (property_exists($object, 'companyName')) {
-            $this->companyName = $object->companyName;
         }
         if (property_exists($object, 'countryCode')) {
             $this->countryCode = $object->countryCode;

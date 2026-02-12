@@ -15,11 +15,6 @@ class GetIINDetailsResponse extends DataObject
 {
     // Properties
     /**
-     * @var string
-     */
-    private $cardType;
-
-    /**
      * @var IINDetail[]
      */
     private $coBrands;
@@ -40,21 +35,6 @@ class GetIINDetailsResponse extends DataObject
     private $paymentProductId;
 
     // Methods
-    /**
-     * @return string
-     */
-    public function getCardType()
-    {
-        return $this->cardType;
-    }
-    /**
-     * @var string
-     */
-    public function setCardType($value)
-    {
-        $this->cardType = $value;
-    }
-
     /**
      * @return IINDetail[]
      */
@@ -121,9 +101,6 @@ class GetIINDetailsResponse extends DataObject
     public function toObject()
     {
         $object = parent::toObject();
-        if ($this->cardType !== null) {
-            $object->cardType = $this->cardType;
-        }
         if ($this->coBrands !== null) {
             $object->coBrands = [];
             foreach ($this->coBrands as $element) {
@@ -152,9 +129,6 @@ class GetIINDetailsResponse extends DataObject
     public function fromObject($object)
     {
         parent::fromObject($object);
-        if (property_exists($object, 'cardType')) {
-            $this->cardType = $object->cardType;
-        }
         if (property_exists($object, 'coBrands')) {
             if (!is_array($object->coBrands) && !is_object($object->coBrands)) {
                 throw new UnexpectedValueException('value \'' . print_r($object->coBrands, true) . '\' is not an array or object');

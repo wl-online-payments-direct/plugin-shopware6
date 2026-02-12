@@ -27,11 +27,6 @@ class CustomerDevice extends DataObject
     /**
      * @var string
      */
-    private $deviceFingerprint;
-
-    /**
-     * @var string
-     */
     private $ipAddress;
 
     /**
@@ -78,21 +73,6 @@ class CustomerDevice extends DataObject
     public function setBrowserData($value)
     {
         $this->browserData = $value;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDeviceFingerprint()
-    {
-        return $this->deviceFingerprint;
-    }
-    /**
-     * @var string
-     */
-    public function setDeviceFingerprint($value)
-    {
-        $this->deviceFingerprint = $value;
     }
 
     /**
@@ -167,9 +147,6 @@ class CustomerDevice extends DataObject
         if ($this->browserData !== null) {
             $object->browserData = $this->browserData->toObject();
         }
-        if ($this->deviceFingerprint !== null) {
-            $object->deviceFingerprint = $this->deviceFingerprint;
-        }
         if ($this->ipAddress !== null) {
             $object->ipAddress = $this->ipAddress;
         }
@@ -202,9 +179,6 @@ class CustomerDevice extends DataObject
             }
             $value = new BrowserData();
             $this->browserData = $value->fromObject($object->browserData);
-        }
-        if (property_exists($object, 'deviceFingerprint')) {
-            $this->deviceFingerprint = $object->deviceFingerprint;
         }
         if (property_exists($object, 'ipAddress')) {
             $this->ipAddress = $object->ipAddress;

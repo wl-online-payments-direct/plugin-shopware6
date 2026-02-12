@@ -94,8 +94,6 @@ EOD;
      */
     public function testValidationException()
     {
-        $this->expectNotToPerformAssertions();
-
         try {
             $emptyBody = new GetIINDetailsRequest();
             $this->getClient()->merchant($this->getMerchantId())->services()->getIINdetails($emptyBody);

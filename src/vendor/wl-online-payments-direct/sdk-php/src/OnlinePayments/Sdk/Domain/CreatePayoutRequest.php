@@ -25,11 +25,6 @@ class CreatePayoutRequest extends DataObject
     private $cardPayoutMethodSpecificInput;
 
     /**
-     * @var OmnichannelPayoutSpecificInput
-     */
-    private $omnichannelPayoutSpecificInput;
-
-    /**
      * @var PaymentReferences
      */
     private $references;
@@ -66,21 +61,6 @@ class CreatePayoutRequest extends DataObject
     }
 
     /**
-     * @return OmnichannelPayoutSpecificInput
-     */
-    public function getOmnichannelPayoutSpecificInput()
-    {
-        return $this->omnichannelPayoutSpecificInput;
-    }
-    /**
-     * @var OmnichannelPayoutSpecificInput
-     */
-    public function setOmnichannelPayoutSpecificInput($value)
-    {
-        $this->omnichannelPayoutSpecificInput = $value;
-    }
-
-    /**
      * @return PaymentReferences
      */
     public function getReferences()
@@ -106,9 +86,6 @@ class CreatePayoutRequest extends DataObject
         }
         if ($this->cardPayoutMethodSpecificInput !== null) {
             $object->cardPayoutMethodSpecificInput = $this->cardPayoutMethodSpecificInput->toObject();
-        }
-        if ($this->omnichannelPayoutSpecificInput !== null) {
-            $object->omnichannelPayoutSpecificInput = $this->omnichannelPayoutSpecificInput->toObject();
         }
         if ($this->references !== null) {
             $object->references = $this->references->toObject();
@@ -137,13 +114,6 @@ class CreatePayoutRequest extends DataObject
             }
             $value = new CardPayoutMethodSpecificInput();
             $this->cardPayoutMethodSpecificInput = $value->fromObject($object->cardPayoutMethodSpecificInput);
-        }
-        if (property_exists($object, 'omnichannelPayoutSpecificInput')) {
-            if (!is_object($object->omnichannelPayoutSpecificInput)) {
-                throw new UnexpectedValueException('value \'' . print_r($object->omnichannelPayoutSpecificInput, true) . '\' is not an object');
-            }
-            $value = new OmnichannelPayoutSpecificInput();
-            $this->omnichannelPayoutSpecificInput = $value->fromObject($object->omnichannelPayoutSpecificInput);
         }
         if (property_exists($object, 'references')) {
             if (!is_object($object->references)) {

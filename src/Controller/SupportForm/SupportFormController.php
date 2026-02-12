@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 /**
  * @author Mediaopt GmbH
@@ -9,14 +10,11 @@ namespace MoptWorldline\Controller\SupportForm;
 
 use MoptWorldline\Bootstrap\Form;
 use MoptWorldline\Service\LogHelper;
-use MoptWorldline\Service\SupportAccount;
 use Shopware\Core\Content\Mail\Service\MailService;
 use Shopware\Core\Content\Media\File\FileSaver;
 use Shopware\Core\Content\Media\File\MediaFile;
 use Shopware\Core\Content\Media\MediaException;
 use Shopware\Core\Content\Media\MediaService;
-use Shopware\Core\Framework\Api\Controller\UserController;
-use Shopware\Core\Framework\Api\Response\Type\Api\JsonType;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -31,32 +29,24 @@ use Symfony\Component\HttpFoundation\Request;
 #[Route(defaults: ['_routeScope' => ['api']])]
 class SupportFormController extends AbstractController
 {
-    private UserController $userController;
-    private JsonType $jsonType;
     private MailService $mailService;
     private EntityRepository $mediaRepository;
     private MediaService $mediaService;
     private FileSaver $fileSaver;
 
     /**
-     * @param UserController $userController
-     * @param JsonType $jsonType
      * @param MailService $mailService
      * @param EntityRepository $mediaRepository
      * @param MediaService $mediaService
      * @param FileSaver $fileSaver
      */
     public function __construct(
-        UserController   $userController,
-        JsonType         $jsonType,
         MailService      $mailService,
         EntityRepository $mediaRepository,
         MediaService     $mediaService,
         FileSaver        $fileSaver,
     )
     {
-        $this->userController = $userController;
-        $this->jsonType = $jsonType;
         $this->mailService = $mailService;
         $this->mediaRepository = $mediaRepository;
         $this->mediaService = $mediaService;
@@ -64,27 +54,12 @@ class SupportFormController extends AbstractController
     }
 
     #[Route(
-        path: '/api/_action/worldline/support-form/check-user-rights',
-        name: 'api.action.worldline.support-form.check-user-rights',
-        methods: ['POST']
-    )]
-    public function checkUserRights(Request $request, Context $context): JsonResponse
-    {
-        $userId = $context->getSource()->getUserId();
-        return new JsonResponse([
-            'createUser' => $this->isAllowedToCreateAnAccount($context),
-            'userEmail' => $this->getUserEmail($userId),
-        ]);
-    }
-
-    #[Route(
-        path: '/api/_action/worldline/support-form/send',
-        name: 'api.action.worldline.support-form.send',
+        path: '/api/_action/support-form/send',
+        name: 'api.action.support-form.send',
         methods: ['POST']
     )]
     public function send(Request $request, Context $context): JsonResponse
     {
-        $createAccount = $request->request->get('createAccount');
         $attachLog = $request->request->get('attachLog');
         $contact = $request->request->get('contact');
         $description = $request->request->get('description');
@@ -95,11 +70,6 @@ class SupportFormController extends AbstractController
         }
         try {
             $message = "$description<br/>contact email: $contact";
-            if ($createAccount && $this->isAllowedToCreateAnAccount($context)) {
-                $supportAccount = new SupportAccount($this->jsonType, $this->userController);
-                $credentials = $supportAccount->getSupportCredentials();
-                $message .= '<br/> support account: ' . json_encode($credentials);
-            }
             $this->sendEmail($message, $attachLog);
         } catch (ConstraintViolationException $e) {
             foreach ($e->getErrors() as $error) {
@@ -113,8 +83,8 @@ class SupportFormController extends AbstractController
     }
 
     #[Route(
-        path: '/api/_action/worldline/support-form/download_log',
-        name: 'api.action.worldline.support-form.download_log',
+        path: '/api/_action/support-form/download_log',
+        name: 'api.action.support-form.download_log',
         methods: ['POST']
     )]
     public function downloadLog(): JsonResponse
@@ -135,12 +105,12 @@ class SupportFormController extends AbstractController
     private function sendEmail(string $message, bool $attachLog): void
     {
         $data = new ParameterBag();
-        $data->set('recipients', ['support@mediaopt.de' => 'Support']);
+        $data->set('recipients', ['support.worldline@logeecom.com' => 'Support']);
 
         $data->set('senderName', 'Plugin User');
         $data->set('contentHtml', $message);
         $data->set('contentPlain', $message);
-        $data->set('subject', 'Support request');
+        $data->set('subject', '[SW6] Support request');
         $data->set('salesChannelId', $this->getSalesChannelId());
 
         if ($attachLog) {
@@ -214,7 +184,7 @@ class SupportFormController extends AbstractController
                 $this->clearMedia($this->getDuplicateId(), $context);
                 $url = $this->getUrl($archivePath);
             }
-        }  catch (\Exception $e) {
+        } catch (\Exception $e) {
             $this->clearMedia($mediaId, $context);
         }
         return $url;
@@ -259,30 +229,5 @@ class SupportFormController extends AbstractController
             ->from('media', 'm')
             ->where("m.file_name = '$filename'");
         return $qb->fetchOne();
-    }
-
-    /**
-     * @param string $userId
-     * @return false|mixed
-     * @throws \Doctrine\DBAL\Exception
-     */
-    private function getUserEmail(string $userId): mixed
-    {
-        $connection = Kernel::getConnection();
-        $qb = $connection->createQueryBuilder();
-        $qb->select('u.email')
-            ->from('user', 'u')
-            ->where('u.id = UNHEX(:id)')
-            ->setParameter('id', $userId);
-        return $qb->fetchOne();
-    }
-
-    /**
-     * @param Context $context
-     * @return bool
-     */
-    private function isAllowedToCreateAnAccount(Context $context): bool
-    {
-        return $context->getSource()->isAllowed('user:create');
     }
 }

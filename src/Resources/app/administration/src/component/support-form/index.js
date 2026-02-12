@@ -16,36 +16,17 @@ Component.register('support-form', {
         return {
             isLoading: false,
             isSaveSuccessful: false,
-            createAccountCheck: true,
             attachLogCheck: true,
             emailField: '',
             descriptionField: '',
             emailPlaceholder: '',
-            createUserFormIsDisabled: true,
-            createUserHelpText: this.$tc('worldline.support-form.user-have-no-rights'),
         };
     },
 
-    created() {
-        this.checkUserRights();
-    },
-
     methods: {
-        checkUserRights() {
-            this.supportForm.checkUserRights(
-            ).then((res) => {
-                if (res.createUser) {
-                    this.createUserFormIsDisabled = false;
-                    this.createUserHelpText = this.$tc('worldline.support-form.create-account-help');
-                }
-                this.emailPlaceholder = res.userEmail;
-                this.isLoading = false;
-            });
-        },
         send() {
             this.supportForm.send(
                 {
-                    'createAccount': this.createAccountCheck,
                     'attachLog': this.attachLogCheck,
                     'contact': this.emailField,
                     'description': this.descriptionField,

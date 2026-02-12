@@ -14,17 +14,19 @@ use MoptWorldline\Bootstrap\Form;
 use MoptWorldline\Service\LogHelper;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\Routing\RoutingException;
+use Shopware\Core\Framework\Routing\Exception\MissingRequestParameterException;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-#[Route(defaults: ['_routeScope' => ['storefront']])]
+/**
+ * @Route(defaults={"_routeScope"={"storefront"}})
+ */
 class IframeController extends AbstractController
 {
     public SystemConfigService $systemConfigService;
@@ -42,16 +44,11 @@ class IframeController extends AbstractController
     }
 
     /**
+     * @Route("/worldline_iframe", name="worldline.iframe", defaults={"XmlHttpRequest"=true}, methods={"GET"})
      * @param Request $request
      * @return JsonResponse
      * @throws Exception
      */
-    #[Route(
-        path: '/worldline_iframe',
-        name: 'worldline.iframe',
-        defaults: ['XmlHttpRequest' => true],
-        methods: ['GET'],
-    )]
     public function showIframe(Request $request): JsonResponse
     {
         $salesChannelId = $request->get('salesChannelId');
@@ -66,16 +63,11 @@ class IframeController extends AbstractController
     }
 
     /**
+     * @Route("/worldline_cardToken", name="worldline.cardToken", defaults={"XmlHttpRequest"=true}, methods={"GET"})
      * @param Request $request
      * @return JsonResponse
      * @throws Exception
      */
-    #[Route(
-        path: '/worldline_cardToken',
-        name: 'worldline.cardToken',
-        defaults: ['XmlHttpRequest' => true],
-        methods: ['GET'],
-    )]
     public function saveCardToken(Request $request): JsonResponse
     {
         $token = $request->get('worldline_cardToken') ?: null;
@@ -84,16 +76,11 @@ class IframeController extends AbstractController
     }
 
     /**
+     * @Route("/worldline_accountCardToken", name="worldline.accountCardToken", defaults={"XmlHttpRequest"=true}, methods={"GET"})
      * @param Request $request
      * @return JsonResponse
      * @throws Exception
      */
-    #[Route(
-        path: '/worldline_accountCardToken',
-        name: 'worldline.accountCardToken',
-        defaults: ['XmlHttpRequest' => true],
-        methods: ['GET'],
-    )]
     public function saveAccountCardToken(Request $request): JsonResponse
     {
         $token = $request->get('worldline_accountCardToken') ?: null;
@@ -102,6 +89,8 @@ class IframeController extends AbstractController
     }
 
     /**
+     * @Route("/worldline/card/delete/{tokenId}", name="worldline.card.delete", options={"seo"="false"}, methods={"POST"}, defaults={"_loginRequired"=true})
+     *
      * @param string $tokenId
      * @param SalesChannelContext $context
      * @param CustomerEntity $customer
@@ -109,18 +98,11 @@ class IframeController extends AbstractController
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    #[Route(
-        path: '/worldline/card/delete/{tokenId}',
-        name: 'worldline.card.delete',
-        options: ['seo' => false],
-        defaults: ['_loginRequired' => true],
-        methods: ['POST']
-    )]
     public function deleteCard(string $tokenId, SalesChannelContext $context, CustomerEntity $customer): RedirectResponse
     {
         $success = true;
         if (!$tokenId) {
-            throw RoutingException::missingRequestParameter ('tokenId');
+            throw new MissingRequestParameterException('tokenId');
         }
 
         try {

@@ -15,15 +15,17 @@ use Shopware\Core\Content\Media\MediaService;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 use MoptWorldline\Controller\PaymentMethod\PaymentMethodController;
 
-#[Route(defaults: ['_routeScope' => ['api']])]
-class PluginConfigController extends AbstractController
+/**
+ * @Route(defaults={"_routeScope"={"api"}})
+ */
+class ApiTestController extends AbstractController
 {
     private SystemConfigService $systemConfigService;
     private EntityRepository $salesChannelRepository;
@@ -33,8 +35,6 @@ class PluginConfigController extends AbstractController
     private EntityRepository $mediaRepository;
     private MediaService $mediaService;
     private FileSaver $fileSaver;
-    private EntityRepository $ruleRepository;
-    private EntityRepository $ruleConditionRepository;
 
     private array $credentialKeys = [
         'sandbox' => [
@@ -60,8 +60,6 @@ class PluginConfigController extends AbstractController
      * @param EntityRepository $mediaRepository
      * @param MediaService $mediaService
      * @param FileSaver $fileSaver
-     * @param EntityRepository $ruleRepository
-     * @param EntityRepository $ruleConditionRepository
      */
     public function __construct(
         SystemConfigService $systemConfigService,
@@ -71,9 +69,7 @@ class PluginConfigController extends AbstractController
         PluginIdProvider    $pluginIdProvider,
         EntityRepository    $mediaRepository,
         MediaService        $mediaService,
-        FileSaver           $fileSaver,
-        EntityRepository    $ruleRepository,
-        EntityRepository    $ruleConditionRepository,
+        FileSaver           $fileSaver
     )
     {
         $this->systemConfigService = $systemConfigService;
@@ -84,15 +80,15 @@ class PluginConfigController extends AbstractController
         $this->mediaRepository = $mediaRepository;
         $this->mediaService = $mediaService;
         $this->fileSaver = $fileSaver;
-        $this->ruleRepository = $ruleRepository;
-        $this->ruleConditionRepository = $ruleConditionRepository;
     }
 
-    #[Route(
-        path: '/api/_action/worldline/api-test/test-connection',
-        name: 'api.action.worldline.test.connection',
-        methods: ['POST']
-    )]
+    /**
+     * @Route(
+     *     "/api/_action/api-test/test-connection",
+     *     name="api.action.test.connection",
+     *     methods={"POST"}
+     * )
+     */
     public function testConnection(Request $request, Context $context): JsonResponse
     {
         $configFormData = $request->request->all('сonfigData');
@@ -128,11 +124,13 @@ class PluginConfigController extends AbstractController
         return $this->response($success, $message, $paymentMethods);
     }
 
-    #[Route(
-        path: '/api/_action/worldline/api-test/savemethod',
-        name: 'api.action.worldline.test.savemethod',
-        methods: ['POST']
-    )]
+    /**
+     * @Route(
+     *     "/api/_action/api-test/savemethod",
+     *     name="api.action.test.savemethod",
+     *     methods={"POST"}
+     * )
+     */
     public function saveMethod(Request $request, Context $context): JsonResponse
     {
         $paymentMethodController = $this->getPaymentMethodController();
@@ -155,9 +153,7 @@ class PluginConfigController extends AbstractController
             $this->mediaRepository,
             $this->mediaService,
             $this->fileSaver,
-            $this->salesChannelRepository,
-            $this->ruleRepository,
-            $this->ruleConditionRepository,
+            $this->salesChannelRepository
         );
     }
 

@@ -36,8 +36,6 @@ class CommunicatorTest extends OnlinePaymentsTestCase
 
     public function testApiRequestNoop()
     {
-        $this->expectNotToPerformAssertions();
-
         new Communicator(new DefaultConnection(), new CommunicatorConfiguration('', '', '', ''));
     }
 
@@ -60,8 +58,6 @@ class CommunicatorTest extends OnlinePaymentsTestCase
      */
     public function testApiRequestGet()
     {
-        $this->expectNotToPerformAssertions();
-
         $relativeUri = sprintf('/%s/%s/products', Client::API_VERSION, $this->getMerchantId());
         $findParams = new GetPaymentProductsParams();
         $findParams->setCountryCode('NL');
@@ -89,8 +85,6 @@ class CommunicatorTest extends OnlinePaymentsTestCase
      */
     public function testApiRequestPost()
     {
-        $this->expectNotToPerformAssertions();
-
         try {
             $relativeUri = sprintf('/%s/%s/payments/1/cancel', Client::API_VERSION, $this->getMerchantId());
             $this->defaultCommunicator->post($this->defaultResponseClassMap, $relativeUri);
@@ -105,8 +99,6 @@ class CommunicatorTest extends OnlinePaymentsTestCase
      */
     public function testApiRequestPut()
     {
-        $this->expectNotToPerformAssertions();
-
         try {
             $relativeUri = sprintf('/%s/%s/tokens/1', Client::API_VERSION, $this->getMerchantId());
             $this->defaultCommunicator->put($this->defaultResponseClassMap, $relativeUri);
@@ -121,8 +113,6 @@ class CommunicatorTest extends OnlinePaymentsTestCase
      */
     public function testApiRequestDelete()
     {
-        $this->expectNotToPerformAssertions();
-
         try {
             $relativeUri = sprintf('/%s/%s/tokens/1', Client::API_VERSION, $this->getMerchantId());
             $this->defaultCommunicator->delete($this->defaultResponseClassMap, $relativeUri);

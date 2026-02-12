@@ -22,8 +22,6 @@ class ProductGroupTest extends ClientTestCase
      */
     public function testRetrievePaymentProductGroups()
     {
-        $this->expectNotToPerformAssertions();
-
         $client = $this->getClient();
         $merchantId = $this->getMerchantId();
 
@@ -46,8 +44,6 @@ class ProductGroupTest extends ClientTestCase
      */
     public function testRetrievePaymentProductGroup()
     {
-        $this->expectNotToPerformAssertions();
-
         $client = $this->getClient();
         $merchantId = $this->getMerchantId();
 

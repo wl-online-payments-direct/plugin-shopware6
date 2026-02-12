@@ -2,7 +2,7 @@
     {% parent() %}
     <sw-container v-if="showOneyField">
         <sw-field
-                identifier="oneyPaymentOption"
+                id="oneyPaymentOption"
                 name="oneyPaymentOption"
                 @change="setOneyPaymentOption"
                 :value="oneyPaymentOptionValue"
@@ -10,17 +10,6 @@
                 class="sw-settings-payment-detail__field-position"
                 :disabled="!acl.can('payment.editor')"
                 :label="$tc('worldline.payment-methods.oney-label')"
-        />
-    </sw-container>
-    <sw-container v-if="showBankTransferField">
-        <sw-switch-field
-                identifier="bankTransferPaymentOption"
-                name="bankTransferPaymentOption"
-                @change="setBankTransferPaymentOption"
-                :value="bankTransferPaymentOptionValue"
-                class="sw-settings-payment-detail__field-position"
-                :disabled="!acl.can('payment.editor')"
-                :label="$tc('worldline.payment-methods.bank-transfer-label')"
         />
     </sw-container>
 {% endblock %}

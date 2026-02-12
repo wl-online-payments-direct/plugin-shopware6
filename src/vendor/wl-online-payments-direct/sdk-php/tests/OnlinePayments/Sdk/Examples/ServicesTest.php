@@ -20,8 +20,6 @@ class ServicesTest extends ClientTestCase
      */
     public function testTestConnection()
     {
-        $this->expectNotToPerformAssertions();
-
         $client = $this->getClient();
         $merchantId = $this->getMerchantId();
         return $client->merchant($merchantId)->services()->testConnection();
@@ -33,8 +31,6 @@ class ServicesTest extends ClientTestCase
      */
     public function testRetrieveIINDetails()
     {
-        $this->expectNotToPerformAssertions();
-
         $client = $this->getClient();
         $merchantId = $this->getMerchantId();
         $body = new GetIINDetailsRequest();
