@@ -9,21 +9,20 @@ namespace MoptWorldline\Controller\Payment;
 
 use MoptWorldline\Adapter\WorldlineSDKAdapter;
 use MoptWorldline\Bootstrap\Form;
+use MoptWorldline\Service\SecureConfigService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Exception;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
 
 /**
  * @Route(defaults={"_routeScope"={"storefront"}})
  */
 class ReturnUrlController extends AbstractController
 {
-    public SystemConfigService $systemConfigService;
+    public SecureConfigService $secureConfigService;
 
     private Session $session;
 
@@ -34,13 +33,13 @@ class ReturnUrlController extends AbstractController
     ];
 
     /**
-     * @param SystemConfigService $systemConfigService
+     * @param SecureConfigService $secureConfigService
      */
     public function __construct(
-        SystemConfigService $systemConfigService
+        SecureConfigService $secureConfigService
     )
     {
-        $this->systemConfigService = $systemConfigService;
+        $this->secureConfigService = $secureConfigService;
         $this->session = new Session();
     }
 

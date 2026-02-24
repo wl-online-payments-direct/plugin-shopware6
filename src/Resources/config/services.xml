@@ -5,7 +5,7 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
         <service id="MoptWorldline\Controller\Api\ApiTestController" public="true">
-            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <argument type="service" id="MoptWorldline\Service\SecureConfigService" />
             <argument type="service" id="sales_channel.repository" />
             <argument type="service" id="payment_method.repository" />
             <argument type="service" id="sales_channel_payment_method.repository" />
@@ -18,7 +18,7 @@
             </call>
         </service>
         <service id="MoptWorldline\Controller\TransactionsControl\TransactionsControlController" public="true">
-            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <argument type="service" id="MoptWorldline\Service\SecureConfigService" />
             <argument type="service" id="order.repository"/>
             <argument type="service" id="customer.repository"/>
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
@@ -30,7 +30,7 @@
             </call>
         </service>
         <service id="MoptWorldline\Service\Payment">
-            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <argument type="service" id="MoptWorldline\Service\SecureConfigService" />
             <argument type="service" id="order.repository"/>
             <argument type="service" id="customer.repository"/>
             <argument type="service" id="translator" />
@@ -39,7 +39,7 @@
             <tag name="shopware.payment.method.async" priority="-5100"/>
         </service>
         <service id="MoptWorldline\Controller\Payment\PaymentFinalizeController" public="true">
-            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <argument type="service" id="MoptWorldline\Service\SecureConfigService" />
             <argument type="service" id="order.repository"/>
             <argument type="service" id="customer.repository"/>
             <argument type="service" id="MoptWorldline\Service\Payment"/>
@@ -52,7 +52,7 @@
             </call>
         </service>
         <service id="MoptWorldline\Controller\Payment\PaymentWebhookController" public="true">
-            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <argument type="service" id="MoptWorldline\Service\SecureConfigService" />
             <argument type="service" id="order.repository"/>
             <argument type="service" id="customer.repository"/>
             <argument type="service" id="MoptWorldline\Service\Payment"/>
@@ -65,7 +65,7 @@
             </call>
         </service>
         <service id="MoptWorldline\Subscriber\OrderChangesSubscriber">
-            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <argument type="service" id="MoptWorldline\Service\SecureConfigService" />
             <argument type="service" id="order.repository" />
             <argument type="service" id="customer.repository"/>
             <argument type="service" id="request_stack"/>
@@ -80,7 +80,7 @@
         <service id="MoptWorldline\Service\CronTaskHandler">
             <argument type="service" id="scheduled_task.repository" />
             <argument type="service" id="sales_channel.repository" />
-            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <argument type="service" id="MoptWorldline\Service\SecureConfigService" />
             <argument type="service" id="order.repository"/>
             <argument type="service" id="customer.repository"/>
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
@@ -89,14 +89,14 @@
             <tag name="messenger.message_handler" />
         </service>
         <service id="MoptWorldline\Controller\Payment\IframeController" public="true">
-            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <argument type="service" id="MoptWorldline\Service\SecureConfigService" />
             <argument type="service" id="customer.repository"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
         </service>
         <service id="MoptWorldline\Controller\Payment\ReturnUrlController" public="true">
-            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <argument type="service" id="MoptWorldline\Service\SecureConfigService" />
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
@@ -130,6 +130,27 @@
         </service>
         <service id="MoptWorldline\Subscriber\SupportFormSubscriber">
             <tag name="kernel.event_subscriber" priority="-5100"/>
+        </service>
+        <service id="MoptWorldline\Subscriber\ConfigEncryptionSubscriber">
+            <argument type="service" id="MoptWorldline\Service\EncryptionService"/>
+            <argument type="service" id="MoptWorldline\Service\SecureFieldDefinition"/>
+            <argument type="service" id="request_stack"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+        <service id="MoptWorldline\Service\EncryptionService" public="true">
+            <argument>%env(APP_SECRET)%</argument>
+        </service>
+        <service id="MoptWorldline\Service\SecureConfigService" public="true">
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
+            <argument type="service" id="MoptWorldline\Service\EncryptionService"/>
+            <argument type="service" id="MoptWorldline\Service\SecureFieldDefinition"/>
+        </service>
+        <service id="MoptWorldline\Service\SecureFieldDefinition" public="true"/>
+        <service id="MoptWorldline\Service\CredentialMigrationService" public="true">
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
+            <argument type="service" id="MoptWorldline\Service\EncryptionService"/>
+            <argument type="service" id="MoptWorldline\Service\SecureFieldDefinition"/>
         </service>
     </services>
 </container>

@@ -12,11 +12,11 @@ use Monolog\Level;
 use MoptWorldline\Adapter\WorldlineSDKAdapter;
 use MoptWorldline\Bootstrap\Form;
 use MoptWorldline\Service\LogHelper;
+use MoptWorldline\Service\SecureConfigService;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Routing\Exception\MissingRequestParameterException;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -29,16 +29,16 @@ use Symfony\Component\HttpFoundation\Session\Session;
  */
 class IframeController extends AbstractController
 {
-    public SystemConfigService $systemConfigService;
+    public SecureConfigService $secureConfigService;
     private Session $session;
     private EntityRepository $customerRepository;
 
     public function __construct(
-        SystemConfigService       $systemConfigService,
+        SecureConfigService       $secureConfigService,
         EntityRepository          $customerRepository
     )
     {
-        $this->systemConfigService = $systemConfigService;
+        $this->secureConfigService = $secureConfigService;
         $this->session = new Session();
         $this->customerRepository = $customerRepository;
     }
@@ -54,7 +54,7 @@ class IframeController extends AbstractController
         $salesChannelId = $request->get('salesChannelId');
         $token = $request->get('token');
         $localeId = $request->get('localeId');
-        $adapter = new WorldlineSDKAdapter($this->systemConfigService, $salesChannelId);
+        $adapter = new WorldlineSDKAdapter($this->secureConfigService, $salesChannelId);
         $tokenizationUrl = $adapter->createHostedTokenizationUrl($token, $localeId);
 
         return new JsonResponse([
@@ -113,7 +113,7 @@ class IframeController extends AbstractController
                     'customFields' => $fields
                 ]
             ], $context->getContext());
-            $adapter = new WorldlineSDKAdapter($this->systemConfigService, $context->getSalesChannelId());
+            $adapter = new WorldlineSDKAdapter($this->secureConfigService, $context->getSalesChannelId());
             $adapter->deleteToken($tokenId);
         } catch (Exception $exception) {
             $success = false;

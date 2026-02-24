@@ -21,8 +21,8 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\StateMachine\StateMachineRegistry;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
 use MoptWorldline\Adapter\WorldlineSDKAdapter;
+use MoptWorldline\Service\SecureConfigService;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PaymentHandler
@@ -38,7 +38,7 @@ class PaymentHandler
     private LogHelper $logger;
 
     /**
-     * @param SystemConfigService $systemConfigService
+     * @param SecureConfigService $secureConfigService
      * @param OrderEntity $order
      * @param TranslatorInterface $translator
      * @param EntityRepository $orderRepository
@@ -48,7 +48,7 @@ class PaymentHandler
      * @param StateMachineRegistry $stateMachineRegistry
      */
     public function __construct(
-        SystemConfigService          $systemConfigService,
+        SecureConfigService          $secureConfigService,
         OrderEntity                  $order,
         TranslatorInterface          $translator,
         EntityRepository    $orderRepository,
@@ -59,7 +59,7 @@ class PaymentHandler
     )
     {
         $salesChannelId = $order->getSalesChannelId();
-        $this->adapter = new WorldlineSDKAdapter($systemConfigService, $salesChannelId);
+        $this->adapter = new WorldlineSDKAdapter($secureConfigService, $salesChannelId);
         $this->logger = new LogHelper($this->adapter);
         $this->logger->setTranslator($translator);
         $this->order = $order;

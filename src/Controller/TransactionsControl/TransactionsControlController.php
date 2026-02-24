@@ -14,6 +14,7 @@ use MoptWorldline\Service\AdminTranslate;
 use MoptWorldline\Service\OrderHelper;
 use MoptWorldline\Service\Payment;
 use MoptWorldline\Service\PaymentHandler;
+use MoptWorldline\Service\SecureConfigService;
 use OnlinePayments\Sdk\ValidationException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
@@ -27,7 +28,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -35,7 +35,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class TransactionsControlController extends AbstractController
 {
-    private SystemConfigService $systemConfigService;
+    private SecureConfigService $secureConfigService;
     private EntityRepository $orderRepository;
     private EntityRepository $customerRepository;
     private OrderTransactionStateHandler $transactionStateHandler;
@@ -44,7 +44,7 @@ class TransactionsControlController extends AbstractController
     private StateMachineRegistry $stateMachineRegistry;
 
     /**
-     * @param SystemConfigService $systemConfigService
+     * @param SecureConfigService $secureConfigService
      * @param EntityRepository $orderRepository
      * @param EntityRepository $customerRepository
      * @param OrderTransactionStateHandler $transactionStateHandler
@@ -53,7 +53,7 @@ class TransactionsControlController extends AbstractController
      * @param StateMachineRegistry $stateMachineRegistry
      */
     public function __construct(
-        SystemConfigService          $systemConfigService,
+        SecureConfigService          $secureConfigService,
         EntityRepository             $orderRepository,
         EntityRepository             $customerRepository,
         OrderTransactionStateHandler $transactionStateHandler,
@@ -62,7 +62,7 @@ class TransactionsControlController extends AbstractController
         StateMachineRegistry $stateMachineRegistry
     )
     {
-        $this->systemConfigService = $systemConfigService;
+        $this->secureConfigService = $secureConfigService;
         $this->orderRepository = $orderRepository;
         $this->customerRepository = $customerRepository;
         $this->transactionStateHandler = $transactionStateHandler;
@@ -158,8 +158,8 @@ class TransactionsControlController extends AbstractController
 
         $salesChannelId = $orderEntity->getSalesChannelId();
 
-        $adapter = new WorldlineSDKAdapter($this->systemConfigService, $salesChannelId);
-        $ReturnUrlController = new ReturnUrlController($this->systemConfigService);
+        $adapter = new WorldlineSDKAdapter($this->secureConfigService, $salesChannelId);
+        $ReturnUrlController = new ReturnUrlController($this->secureConfigService);
         $returnUrl = $ReturnUrlController->getReturnUrl($adapter, $adapter->isLiveMode());
         $apiKey = $orderEntity->getSalesChannel()->getAccessKey();
 
@@ -208,7 +208,7 @@ class TransactionsControlController extends AbstractController
             }
             $allowedAmounts = Payment::getAllowed($customFields);
 
-            $adapter = new WorldlineSDKAdapter($this->systemConfigService, $order->getSalesChannelId());
+            $adapter = new WorldlineSDKAdapter($this->secureConfigService, $order->getSalesChannelId());
             $partialOperationsEnabled = $adapter->getPluginConfig(Form::PARTIAL_OPERATIONS_ENABLED);
         } catch (\Exception $e) {
             return $this->response(false, $e->getMessage());
@@ -234,7 +234,7 @@ class TransactionsControlController extends AbstractController
     public function getOneyPaymentOption(): JsonResponse
     {
         return new JsonResponse([
-            'value' => $this->systemConfigService->get(Form::ONEY_PAYMENT_OPTION_FIELD)
+            'value' => $this->secureConfigService->get(Form::ONEY_PAYMENT_OPTION_FIELD)
         ]);
     }
 
@@ -248,7 +248,7 @@ class TransactionsControlController extends AbstractController
     public function setOneyPaymentOption(Request $request): JsonResponse
     {
         $oneyPaymentOption = $request->request->get('oneyPaymentOption');
-        $this->systemConfigService->set(Form::ONEY_PAYMENT_OPTION_FIELD, $oneyPaymentOption);
+        $this->secureConfigService->set(Form::ONEY_PAYMENT_OPTION_FIELD, $oneyPaymentOption);
         return new JsonResponse([
             'value' => $oneyPaymentOption
         ]);
@@ -323,7 +323,7 @@ class TransactionsControlController extends AbstractController
         $order = OrderHelper::getOrder($context, $this->orderRepository, $hostedCheckoutId);
 
         return new PaymentHandler(
-            $this->systemConfigService,
+            $this->secureConfigService,
             $order,
             $this->translator,
             $this->orderRepository,

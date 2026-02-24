@@ -61,8 +61,8 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Exception\AsyncPaymentProcessException;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
 use MoptWorldline\Bootstrap\Form;
+use MoptWorldline\Service\SecureConfigService;
 use OnlinePayments\Sdk\DefaultConnection;
 use OnlinePayments\Sdk\CommunicatorConfiguration;
 use OnlinePayments\Sdk\Communicator;
@@ -92,19 +92,19 @@ class WorldlineSDKAdapter
     /** @var MerchantClient */
     protected $merchantClient;
 
-    /** @var SystemConfigService */
-    private $systemConfigService;
+    /** @var SecureConfigService */
+    private $secureConfigService;
 
     /** @var string|null */
     private $salesChannelId;
 
     /**
-     * @param SystemConfigService $systemConfigService
+     * @param SecureConfigService $secureConfigService
      * @param string|null $salesChannelId
      */
-    public function __construct(SystemConfigService $systemConfigService, ?string $salesChannelId = null)
+    public function __construct(SecureConfigService $secureConfigService, ?string $salesChannelId = null)
     {
-        $this->systemConfigService = $systemConfigService;
+        $this->secureConfigService = $secureConfigService;
         $this->salesChannelId = $salesChannelId;
     }
 
@@ -196,7 +196,7 @@ class WorldlineSDKAdapter
         $order->setAmountOfMoney($amountOfMoney);
 
         $hostedCheckoutSpecificInput = new HostedCheckoutSpecificInput();
-        $ReturnUrlController = new ReturnUrlController($this->systemConfigService);
+        $ReturnUrlController = new ReturnUrlController($this->secureConfigService);
         $returnUrl = $ReturnUrlController->getReturnUrl($this, $this->isLiveMode());
         $hostedCheckoutSpecificInput->setReturnUrl($returnUrl);
         $hostedCheckoutSpecificInput->setLocale(OrderHelper::getLocale($orderEntity));
@@ -388,7 +388,7 @@ class WorldlineSDKAdapter
         $order->setAmountOfMoney($amountOfMoney);
         $order->setCustomer($customer);
 
-        $ReturnUrlController = new ReturnUrlController($this->systemConfigService);
+        $ReturnUrlController = new ReturnUrlController($this->secureConfigService);
         $returnUrl = $ReturnUrlController->getReturnUrl($this, $this->isLiveMode());
         $redirectionData = new RedirectionData();
         $redirectionData->setReturnUrl($returnUrl);
@@ -636,7 +636,7 @@ class WorldlineSDKAdapter
      */
     public function getPluginConfig(string $key)
     {
-        return $this->systemConfigService->get($key, $this->salesChannelId);
+        return $this->secureConfigService->get($key, $this->salesChannelId);
     }
 
     /**

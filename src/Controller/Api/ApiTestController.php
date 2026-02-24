@@ -10,6 +10,7 @@ namespace MoptWorldline\Controller\Api;
 use MoptWorldline\Adapter\WorldlineSDKAdapter;
 use MoptWorldline\Bootstrap\Form;
 use MoptWorldline\Service\Helper;
+use MoptWorldline\Service\SecureConfigService;
 use Shopware\Core\Content\Media\File\FileSaver;
 use Shopware\Core\Content\Media\MediaService;
 use Shopware\Core\Framework\Context;
@@ -19,7 +20,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
 use MoptWorldline\Controller\PaymentMethod\PaymentMethodController;
 
 /**
@@ -27,7 +27,7 @@ use MoptWorldline\Controller\PaymentMethod\PaymentMethodController;
  */
 class ApiTestController extends AbstractController
 {
-    private SystemConfigService $systemConfigService;
+    private SecureConfigService $secureConfigService;
     private EntityRepository $salesChannelRepository;
     private EntityRepository $paymentMethodRepository;
     private EntityRepository $salesChannelPaymentRepository;
@@ -52,7 +52,7 @@ class ApiTestController extends AbstractController
     ];
 
     /**
-     * @param SystemConfigService $systemConfigService
+     * @param SecureConfigService $secureConfigService
      * @param EntityRepository $salesChannelRepository
      * @param EntityRepository $paymentMethodRepository
      * @param EntityRepository $salesChannelPaymentRepository
@@ -62,7 +62,7 @@ class ApiTestController extends AbstractController
      * @param FileSaver $fileSaver
      */
     public function __construct(
-        SystemConfigService $systemConfigService,
+        SecureConfigService $secureConfigService,
         EntityRepository    $salesChannelRepository,
         EntityRepository    $paymentMethodRepository,
         EntityRepository    $salesChannelPaymentRepository,
@@ -72,7 +72,7 @@ class ApiTestController extends AbstractController
         FileSaver           $fileSaver
     )
     {
-        $this->systemConfigService = $systemConfigService;
+        $this->secureConfigService = $secureConfigService;
         $this->salesChannelRepository = $salesChannelRepository;
         $this->paymentMethodRepository = $paymentMethodRepository;
         $this->salesChannelPaymentRepository = $salesChannelPaymentRepository;
@@ -95,6 +95,15 @@ class ApiTestController extends AbstractController
 
         if (empty($configFormData)) {
             return $this->response(false, "There is no config data.");
+        }
+
+        // Check if decryption failed when loading config
+        if ($request->hasSession() && $request->getSession()->get('worldline.decryption_failed')) {
+            $request->getSession()->remove('worldline.decryption_failed');
+            return $this->response(
+                false,
+                '<br/>Failed to decrypt secure fields. Please re-enter your API credentials.'
+            );
         }
 
         $salesChannelId = $request->request->get('salesChannelId');
@@ -146,7 +155,7 @@ class ApiTestController extends AbstractController
     private function getPaymentMethodController()
     {
         return new PaymentMethodController(
-            $this->systemConfigService,
+            $this->secureConfigService,
             $this->paymentMethodRepository,
             $this->salesChannelPaymentRepository,
             $this->pluginIdProvider,
