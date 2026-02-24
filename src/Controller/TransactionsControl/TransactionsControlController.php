@@ -13,6 +13,7 @@ use MoptWorldline\Bootstrap\Form;
 use MoptWorldline\Service\AdminTranslate;
 use MoptWorldline\Service\Payment;
 use MoptWorldline\Service\PaymentHandler;
+use MoptWorldline\Service\SecureConfigService;
 use OnlinePayments\Sdk\ValidationException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
@@ -27,7 +28,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -35,7 +35,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class TransactionsControlController extends AbstractController
 {
-    private SystemConfigService $systemConfigService;
+    private SecureConfigService $secureConfigService;
     private EntityRepositoryInterface $orderRepository;
     private EntityRepositoryInterface $customerRepository;
     private OrderTransactionStateHandler $transactionStateHandler;
@@ -44,7 +44,7 @@ class TransactionsControlController extends AbstractController
     private RequestStack $requestStack;
 
     /**
-     * @param SystemConfigService $systemConfigService
+     * @param SecureConfigService $secureConfigService
      * @param EntityRepositoryInterface $orderRepository
      * @param EntityRepositoryInterface $customerRepository
      * @param OrderTransactionStateHandler $transactionStateHandler
@@ -53,7 +53,7 @@ class TransactionsControlController extends AbstractController
      * @param RequestStack $requestStack
      */
     public function __construct(
-        SystemConfigService          $systemConfigService,
+        SecureConfigService          $secureConfigService,
         EntityRepositoryInterface    $orderRepository,
         EntityRepositoryInterface    $customerRepository,
         OrderTransactionStateHandler $transactionStateHandler,
@@ -62,7 +62,7 @@ class TransactionsControlController extends AbstractController
         RequestStack                 $requestStack
     )
     {
-        $this->systemConfigService = $systemConfigService;
+        $this->secureConfigService = $secureConfigService;
         $this->orderRepository = $orderRepository;
         $this->customerRepository = $customerRepository;
         $this->transactionStateHandler = $transactionStateHandler;
@@ -157,7 +157,7 @@ class TransactionsControlController extends AbstractController
 
         $salesChannelId = $orderEntity->getSalesChannelId();
 
-        $adapter = new WorldlineSDKAdapter($this->systemConfigService, $this->logger, $salesChannelId);
+        $adapter = new WorldlineSDKAdapter($this->secureConfigService, $this->logger, $salesChannelId);
         $returnUrl = $adapter->getReturnUrl();
         $apiKey = $orderEntity->getSalesChannel()->getAccessKey();
 
@@ -228,7 +228,7 @@ class TransactionsControlController extends AbstractController
     public function getOneyPaymentOption(): JsonResponse
     {
         return new JsonResponse([
-            'value' => $this->systemConfigService->get(Form::ONEY_PAYMENT_OPTION_FIELD)
+            'value' => $this->secureConfigService->get(Form::ONEY_PAYMENT_OPTION_FIELD)
         ]);
     }
 
@@ -242,7 +242,7 @@ class TransactionsControlController extends AbstractController
     public function setOneyPaymentOption(Request $request): JsonResponse
     {
         $oneyPaymentOption = $request->request->get('oneyPaymentOption');
-        $this->systemConfigService->set(Form::ONEY_PAYMENT_OPTION_FIELD, $oneyPaymentOption);
+        $this->secureConfigService->set(Form::ONEY_PAYMENT_OPTION_FIELD, $oneyPaymentOption);
         return new JsonResponse([
             'value' => $oneyPaymentOption
         ]);
@@ -317,7 +317,7 @@ class TransactionsControlController extends AbstractController
         $order = PaymentHandler::getOrder($context, $this->orderRepository, $hostedCheckoutId);
 
         return new PaymentHandler(
-            $this->systemConfigService,
+            $this->secureConfigService,
             $this->logger,
             $order,
             $this->translator,

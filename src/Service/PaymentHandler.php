@@ -19,8 +19,8 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
 use Shopware\Core\Kernel;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
 use MoptWorldline\Adapter\WorldlineSDKAdapter;
+use MoptWorldline\Service\SecureConfigService;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PaymentHandler
@@ -34,7 +34,7 @@ class PaymentHandler
     private EntityRepositoryInterface $customerRepository;
 
     /**
-     * @param SystemConfigService $systemConfigService
+     * @param SecureConfigService $secureConfigService
      * @param Logger $logger
      * @param OrderEntity $order
      * @param TranslatorInterface $translator
@@ -44,7 +44,7 @@ class PaymentHandler
      * @param OrderTransactionStateHandler $transactionStateHandler
      */
     public function __construct(
-        SystemConfigService          $systemConfigService,
+        SecureConfigService          $secureConfigService,
         Logger                       $logger,
         OrderEntity                  $order,
         TranslatorInterface          $translator,
@@ -55,7 +55,7 @@ class PaymentHandler
     )
     {
         $salesChannelId = $order->getSalesChannelId();
-        $this->adapter = new WorldlineSDKAdapter($systemConfigService, $logger, $salesChannelId);
+        $this->adapter = new WorldlineSDKAdapter($secureConfigService, $logger, $salesChannelId);
         $this->order = $order;
         $this->translator = $translator;
         $this->orderRepository = $orderRepository;

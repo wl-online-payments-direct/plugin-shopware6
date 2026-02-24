@@ -8,9 +8,9 @@
 namespace MoptWorldline\Controller\Payment;
 
 use MoptWorldline\Adapter\WorldlineSDKAdapter;
-use MoptWorldline\Bootstrap\Form;
 use OnlinePayments\Sdk\Webhooks\InMemorySecretKeyStore;
 use OnlinePayments\Sdk\Webhooks\WebhooksHelper;
+use MoptWorldline\Service\SecureConfigService;
 use MoptWorldline\Service\AdminTranslate;
 use MoptWorldline\Service\PaymentHandler;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
@@ -26,7 +26,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\RouterInterface;
 use Monolog\Logger;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -39,12 +38,12 @@ class PaymentWebhookController extends AbstractController
     private EntityRepositoryInterface $customerRepository;
     private AsynchronousPaymentHandlerInterface $paymentHandler;
     private OrderTransactionStateHandler $transactionStateHandler;
-    private SystemConfigService $systemConfigService;
+    private SecureConfigService $secureConfigService;
     private Logger $logger;
     private TranslatorInterface $translator;
 
     public function __construct(
-        SystemConfigService                 $systemConfigService,
+        SecureConfigService                 $secureConfigService,
         EntityRepositoryInterface           $orderRepository,
         EntityRepositoryInterface           $customerRepository,
         AsynchronousPaymentHandlerInterface $paymentHandler,
@@ -54,7 +53,7 @@ class PaymentWebhookController extends AbstractController
         TranslatorInterface                 $translator
     )
     {
-        $this->systemConfigService = $systemConfigService;
+        $this->secureConfigService = $secureConfigService;
         $this->orderRepository = $orderRepository;
         $this->customerRepository = $customerRepository;
         $this->paymentHandler = $paymentHandler;
@@ -95,7 +94,7 @@ class PaymentWebhookController extends AbstractController
         }
 
         $paymentHandler = new PaymentHandler(
-            $this->systemConfigService,
+            $this->secureConfigService,
             $this->logger,
             $order,
             $this->translator,
@@ -124,7 +123,7 @@ class PaymentWebhookController extends AbstractController
             $headers[$key] = $header[0];
         }
 
-        $adapter = new WorldlineSDKAdapter($this->systemConfigService, $this->logger, $salesChannelId);
+        $adapter = new WorldlineSDKAdapter($this->secureConfigService, $this->logger, $salesChannelId);
         $keys = new InMemorySecretKeyStore($adapter->getWebhookCredentials());
         $helper = new WebhooksHelper($keys);
 

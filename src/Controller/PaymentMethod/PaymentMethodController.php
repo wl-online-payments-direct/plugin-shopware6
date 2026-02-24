@@ -13,19 +13,19 @@ use MoptWorldline\Service\MediaHelper;
 use MoptWorldline\Service\Payment;
 use MoptWorldline\Service\PaymentMethodHelper;
 use MoptWorldline\Service\PaymentProducts;
+use MoptWorldline\Service\SecureConfigService;
 use OnlinePayments\Sdk\Domain\PaymentProduct;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Shopware\Core\Content\Media\File\FileSaver;
 use Shopware\Core\Content\Media\MediaService;
 
 class PaymentMethodController
 {
-    private SystemConfigService $systemConfigService;
+    private SecureConfigService $secureConfigService;
     private Logger $logger;
     private EntityRepositoryInterface $paymentMethodRepository;
     private EntityRepositoryInterface $salesChannelPaymentRepository;
@@ -36,7 +36,7 @@ class PaymentMethodController
     private EntityRepositoryInterface $salesChannelRepository;
 
     /**
-     * @param SystemConfigService $systemConfigService
+     * @param SecureConfigService $secureConfigService
      * @param Logger $logger
      * @param EntityRepositoryInterface $paymentMethodRepository
      * @param EntityRepositoryInterface $salesChannelPaymentRepository
@@ -47,7 +47,7 @@ class PaymentMethodController
      * @param EntityRepositoryInterface $salesChannelRepository
      */
     public function __construct(
-        SystemConfigService       $systemConfigService,
+        SecureConfigService       $secureConfigService,
         Logger                    $logger,
         EntityRepositoryInterface $paymentMethodRepository,
         EntityRepositoryInterface $salesChannelPaymentRepository,
@@ -58,7 +58,7 @@ class PaymentMethodController
         EntityRepositoryInterface $salesChannelRepository
     )
     {
-        $this->systemConfigService = $systemConfigService;
+        $this->secureConfigService = $secureConfigService;
         $this->logger = $logger;
         $this->paymentMethodRepository = $paymentMethodRepository;
         $this->salesChannelPaymentRepository = $salesChannelPaymentRepository;
@@ -103,7 +103,7 @@ class PaymentMethodController
         if (empty($toCreate)) {
             return $this->response();
         }
-        $adapter = new WorldlineSDKAdapter($this->systemConfigService, $this->logger, $salesChannelId);
+        $adapter = new WorldlineSDKAdapter($this->secureConfigService, $this->logger, $salesChannelId);
         $mediaHelper = new MediaHelper(
             $this->mediaRepository, $this->mediaService, $this->fileSaver, $this->logger, $this->paymentMethodRepository
         );
@@ -168,7 +168,7 @@ class PaymentMethodController
             ];
         }
 
-        $adapter = new WorldlineSDKAdapter($this->systemConfigService, $this->logger, $salesChannelId);
+        $adapter = new WorldlineSDKAdapter($this->secureConfigService, $this->logger, $salesChannelId);
         $adapter->getMerchantClient($credentials);
 
         $paymentProducts = $adapter->getPaymentProducts($countryIso3, $currencyIsoCode);

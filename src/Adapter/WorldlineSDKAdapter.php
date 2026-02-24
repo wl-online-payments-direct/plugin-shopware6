@@ -52,8 +52,8 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Exception\AsyncPaymentProcessException;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
 use MoptWorldline\Bootstrap\Form;
+use MoptWorldline\Service\SecureConfigService;
 use OnlinePayments\Sdk\DefaultConnection;
 use OnlinePayments\Sdk\CommunicatorConfiguration;
 use OnlinePayments\Sdk\Communicator;
@@ -82,8 +82,8 @@ class WorldlineSDKAdapter
     /** @var MerchantClient */
     protected $merchantClient;
 
-    /** @var SystemConfigService */
-    private $systemConfigService;
+    /** @var SecureConfigService */
+    private $secureConfigService;
 
     /** @var Logger */
     private $logger;
@@ -92,13 +92,13 @@ class WorldlineSDKAdapter
     private $salesChannelId;
 
     /**
-     * @param SystemConfigService $systemConfigService
+     * @param SecureConfigService $secureConfigService
      * @param Logger $logger
      * @param string|null $salesChannelId
      */
-    public function __construct(SystemConfigService $systemConfigService, Logger $logger, ?string $salesChannelId = null)
+    public function __construct(SecureConfigService $secureConfigService, Logger $logger, ?string $salesChannelId = null)
     {
-        $this->systemConfigService = $systemConfigService;
+        $this->secureConfigService = $secureConfigService;
         $this->logger = $logger;
         $this->salesChannelId = $salesChannelId;
     }
@@ -632,7 +632,7 @@ class WorldlineSDKAdapter
      */
     public function getPluginConfig(string $key)
     {
-        return $this->systemConfigService->get($key, $this->salesChannelId);
+        return $this->secureConfigService->get($key, $this->salesChannelId);
     }
 
     /**

@@ -7,7 +7,6 @@
 
 namespace MoptWorldline\Service;
 
-use MoptWorldline\MoptWorldline;
 use Shopware\Core\Checkout\Payment\Exception\CustomerCanceledAsyncPaymentException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
@@ -18,12 +17,12 @@ use Shopware\Core\Checkout\Payment\Exception\AsyncPaymentFinalizeException;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Monolog\Logger;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use MoptWorldline\Bootstrap\Form;
+use MoptWorldline\Service\SecureConfigService;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -70,7 +69,7 @@ class Payment implements AsynchronousPaymentHandlerInterface
     const DIRECT_SALE = 'SALE';
     const FINAL_AUTHORIZATION = 'FINAL_AUTHORIZATION';
 
-    private SystemConfigService $systemConfigService;
+    private SecureConfigService $secureConfigService;
     private EntityRepositoryInterface $orderRepository;
     private EntityRepositoryInterface $customerRepository;
     private TranslatorInterface $translator;
@@ -141,7 +140,7 @@ class Payment implements AsynchronousPaymentHandlerInterface
     ];
 
     /**
-     * @param SystemConfigService $systemConfigService
+     * @param SecureConfigService $secureConfigService
      * @param EntityRepositoryInterface $orderRepository
      * @param EntityRepositoryInterface $customerRepository
      * @param TranslatorInterface $translator
@@ -150,7 +149,7 @@ class Payment implements AsynchronousPaymentHandlerInterface
      * @param Session $session
      */
     public function __construct(
-        SystemConfigService          $systemConfigService,
+        SecureConfigService          $secureConfigService,
         EntityRepositoryInterface    $orderRepository,
         EntityRepositoryInterface    $customerRepository,
         TranslatorInterface          $translator,
@@ -159,7 +158,7 @@ class Payment implements AsynchronousPaymentHandlerInterface
         Session                      $session
     )
     {
-        $this->systemConfigService = $systemConfigService;
+        $this->secureConfigService = $secureConfigService;
         $this->orderRepository = $orderRepository;
         $this->customerRepository = $customerRepository;
         $this->translator = $translator;
@@ -393,7 +392,7 @@ class Payment implements AsynchronousPaymentHandlerInterface
         $order = $this->orderRepository->search($criteria, $context)->first();
 
         return new PaymentHandler(
-            $this->systemConfigService,
+            $this->secureConfigService,
             $this->logger,
             $order,
             $this->translator,

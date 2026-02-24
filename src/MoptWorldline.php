@@ -8,12 +8,14 @@ declare(strict_types=1);
 
 namespace MoptWorldline;
 
+use MoptWorldline\Service\CredentialMigrationService;
 use MoptWorldline\Service\Payment;
 use MoptWorldline\Service\PaymentMethodHelper;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\UninstallContext;
+use Shopware\Core\Framework\Plugin\Context\UpdateContext;
 use Shopware\Core\Framework\Plugin\Context\ActivateContext;
 use Shopware\Core\Framework\Plugin\Context\DeactivateContext;
 use MoptWorldline\Service\CustomField;
@@ -25,7 +27,9 @@ class MoptWorldline extends Plugin
 
     const PLUGIN_NAME = 'MoptWorldline';
 
-    const PLUGIN_VERSION = '1.8.7';
+    const PLUGIN_VERSION = '1.8.8';
+    private const ENCRYPTION_INTRODUCED_VERSION = '1.8.8';
+
 
     /**
      * @param InstallContext $installContext
@@ -66,6 +70,21 @@ class MoptWorldline extends Plugin
     {
         parent::uninstall($uninstallContext);
         $this->setPaymentMethodsStatus(false, $uninstallContext->getContext());
+    }
+
+    /**
+     * @param UpdateContext $updateContext
+     *
+     * @return void
+     */
+    public function update(UpdateContext $updateContext): void
+    {
+        parent::update($updateContext);
+
+        if (version_compare($updateContext->getCurrentPluginVersion(), self::ENCRYPTION_INTRODUCED_VERSION, '<')) {
+            $migrationService = $this->container->get(CredentialMigrationService::class);
+            $migrationService->migrate($updateContext->getContext());
+        }
     }
 
     /**

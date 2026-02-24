@@ -6,12 +6,12 @@ use Exception;
 use Monolog\Logger;
 use MoptWorldline\Adapter\WorldlineSDKAdapter;
 use MoptWorldline\Bootstrap\Form;
+use MoptWorldline\Service\SecureConfigService;
 use Psr\Log\LogLevel;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\Routing\Exception\MissingRequestParameterException;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -26,19 +26,19 @@ use Shopware\Core\Framework\Routing\Annotation\LoginRequired;
  */
 class IframeController extends AbstractController
 {
-    public SystemConfigService $systemConfigService;
+    public SecureConfigService $secureConfigService;
     private Logger $logger;
     private Session $session;
     private EntityRepositoryInterface $customerRepository;
 
     public function __construct(
-        SystemConfigService       $systemConfigService,
+        SecureConfigService       $secureConfigService,
         Logger                    $logger,
         Session                   $session,
         EntityRepositoryInterface $customerRepository
     )
     {
-        $this->systemConfigService = $systemConfigService;
+        $this->secureConfigService = $secureConfigService;
         $this->logger = $logger;
         $this->session = $session;
         $this->customerRepository = $customerRepository;
@@ -54,7 +54,7 @@ class IframeController extends AbstractController
     {
         $salesChannelId = $request->get('salesChannelId');
         $token = $request->get('token');
-        $adapter = new WorldlineSDKAdapter($this->systemConfigService, $this->logger, $salesChannelId);
+        $adapter = new WorldlineSDKAdapter($this->secureConfigService, $this->logger, $salesChannelId);
         $tokenizationUrl = $adapter->createHostedTokenizationUrl($token);
 
         return new JsonResponse([
@@ -114,7 +114,7 @@ class IframeController extends AbstractController
                     'customFields' => $fields
                 ]
             ], $context->getContext());
-            $adapter = new WorldlineSDKAdapter($this->systemConfigService, $this->logger, $context->getSalesChannelId());
+            $adapter = new WorldlineSDKAdapter($this->secureConfigService, $this->logger, $context->getSalesChannelId());
             $adapter->deleteToken($tokenId);
         } catch (Exception $exception) {
             $success = false;

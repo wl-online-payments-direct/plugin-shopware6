@@ -4,9 +4,9 @@ namespace MoptWorldline\Subscriber;
 
 use Monolog\Logger;
 use MoptWorldline\Bootstrap\Form;
-use MoptWorldline\Service\Helper;
 use MoptWorldline\Service\Payment;
 use MoptWorldline\Service\PaymentHandler;
+use MoptWorldline\Service\SecureConfigService;
 use Psr\Log\LogLevel;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -15,7 +15,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Shopware\Storefront\Event\RouteRequest\HandlePaymentMethodRouteRequestEvent;
 use Shopware\Storefront\Event\StorefrontRenderEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -26,7 +25,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 class OrderChangesSubscriber implements EventSubscriberInterface
 {
-    private SystemConfigService $systemConfigService;
+    private SecureConfigService $secureConfigService;
     private EntityRepositoryInterface $orderRepository;
     private EntityRepositoryInterface $customerRepository;
     private Logger $logger;
@@ -36,7 +35,7 @@ class OrderChangesSubscriber implements EventSubscriberInterface
     private Session $session;
 
     /**
-     * @param SystemConfigService $systemConfigService
+     * @param SecureConfigService $secureConfigService
      * @param EntityRepositoryInterface $orderRepository
      * @param EntityRepositoryInterface $customerRepository
      * @param Logger $logger
@@ -46,7 +45,7 @@ class OrderChangesSubscriber implements EventSubscriberInterface
      * @param Session $session
      */
     public function __construct(
-        SystemConfigService          $systemConfigService,
+        SecureConfigService          $secureConfigService,
         EntityRepositoryInterface    $orderRepository,
         EntityRepositoryInterface    $customerRepository,
         Logger                       $logger,
@@ -56,7 +55,7 @@ class OrderChangesSubscriber implements EventSubscriberInterface
         Session                      $session
     )
     {
-        $this->systemConfigService = $systemConfigService;
+        $this->secureConfigService = $secureConfigService;
         $this->orderRepository = $orderRepository;
         $this->customerRepository = $customerRepository;
         $this->logger = $logger;
@@ -168,7 +167,7 @@ class OrderChangesSubscriber implements EventSubscriberInterface
         $order = PaymentHandler::getOrder($context, $this->orderRepository, $hostedCheckoutId);
 
         $paymentHandler = new PaymentHandler(
-            $this->systemConfigService,
+            $this->secureConfigService,
             $this->logger,
             $order,
             $this->translator,
