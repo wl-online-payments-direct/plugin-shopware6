@@ -9,6 +9,7 @@ namespace MoptWorldline\Service;
 
 use MoptWorldline\Adapter\WorldlineSDKAdapter;
 use MoptWorldline\Bootstrap\Form;
+use MoptWorldline\Service\SecureConfigService;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\OrderStates;
 use Shopware\Core\Framework\Context;
@@ -17,13 +18,12 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 use Shopware\Core\Kernel;
 use Shopware\Core\System\StateMachine\StateMachineRegistry;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CronTaskHandler extends ScheduledTaskHandler
 {
     private EntityRepository $salesChannelRepository;
-    private SystemConfigService $systemConfigService;
+    private SecureConfigService $secureConfigService;
     private EntityRepository $orderRepository;
     private EntityRepository $customerRepository;
     private OrderTransactionStateHandler $transactionStateHandler;
@@ -36,7 +36,7 @@ class CronTaskHandler extends ScheduledTaskHandler
     public function __construct(
         EntityRepository             $scheduledTaskRepository,
         EntityRepository             $salesChannelRepository,
-        SystemConfigService          $systemConfigService,
+        SecureConfigService          $secureConfigService,
         EntityRepository             $orderRepository,
         EntityRepository             $customerRepository,
         OrderTransactionStateHandler $transactionStateHandler,
@@ -45,7 +45,7 @@ class CronTaskHandler extends ScheduledTaskHandler
     )
     {
         $this->salesChannelRepository = $salesChannelRepository;
-        $this->systemConfigService = $systemConfigService;
+        $this->secureConfigService = $secureConfigService;
         $this->orderRepository = $orderRepository;
         $this->customerRepository = $customerRepository;
         $this->transactionStateHandler = $transactionStateHandler;
@@ -85,7 +85,7 @@ class CronTaskHandler extends ScheduledTaskHandler
      */
     private function getOrderList(string $salesChannelId, string $mode): array
     {
-        $adapter = new WorldlineSDKAdapter($this->systemConfigService, $salesChannelId);
+        $adapter = new WorldlineSDKAdapter($this->secureConfigService, $salesChannelId);
         $connection = Kernel::getConnection();
 
         $qb = $connection->createQueryBuilder();
@@ -180,7 +180,7 @@ class CronTaskHandler extends ScheduledTaskHandler
         );
 
         $paymentHandler = new PaymentHandler(
-            $this->systemConfigService,
+            $this->secureConfigService,
             $order,
             $this->translator,
             $this->orderRepository,

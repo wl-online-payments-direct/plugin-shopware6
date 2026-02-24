@@ -3,23 +3,23 @@
 namespace MoptWorldline\Subscriber;
 
 use MoptWorldline\Adapter\WorldlineSDKAdapter;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
+use MoptWorldline\Service\SecureConfigService;
 use Shopware\Storefront\Event\StorefrontRenderEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use MoptWorldline\Bootstrap\Form;
 
 class CheckoutSubscriber implements EventSubscriberInterface
 {
-    private SystemConfigService $systemConfigService;
+    private SecureConfigService $secureConfigService;
 
     /**
-     * @param SystemConfigService $systemConfigService
+     * @param SecureConfigService $secureConfigService
      */
     public function __construct(
-        SystemConfigService $systemConfigService
+        SecureConfigService $secureConfigService
     )
     {
-        $this->systemConfigService = $systemConfigService;
+        $this->secureConfigService = $secureConfigService;
     }
 
     /**
@@ -40,7 +40,7 @@ class CheckoutSubscriber implements EventSubscriberInterface
     {
         if ($this->isCheckoutPage($event)) {
             $salesChannelId = $event->getSalesChannelContext()->getSalesChannel()->getId();
-            $adapter = new WorldlineSDKAdapter($this->systemConfigService, $salesChannelId);
+            $adapter = new WorldlineSDKAdapter($this->secureConfigService, $salesChannelId);
             if ($adapter->isLiveMode()) {
                 $endpoint = $adapter->getPluginConfig(Form::LIVE_ENDPOINT_FIELD);
             } else {
