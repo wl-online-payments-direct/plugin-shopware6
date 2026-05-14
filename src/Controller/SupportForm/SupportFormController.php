@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /**
  * @author Mediaopt GmbH
@@ -21,7 +20,7 @@ use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\Framework\Validation\Exception\ConstraintViolationException;
 use Shopware\Core\Kernel;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -54,8 +53,22 @@ class SupportFormController extends AbstractController
     }
 
     #[Route(
-        path: '/api/_action/support-form/send',
-        name: 'api.action.support-form.send',
+        path: '/api/_action/worldline/support-form/check-user-rights',
+        name: 'api.action.worldline.support-form.check-user-rights',
+        methods: ['POST']
+    )]
+    public function checkUserRights(Request $request, Context $context): JsonResponse
+    {
+        $userId = $context->getSource()->getUserId();
+        return new JsonResponse([
+            'createUser' => $this->isAllowedToCreateAnAccount($context),
+            'userEmail' => $this->getUserEmail($userId),
+        ]);
+    }
+
+    #[Route(
+        path: '/api/_action/worldline/support-form/send',
+        name: 'api.action.worldline.support-form.send',
         methods: ['POST']
     )]
     public function send(Request $request, Context $context): JsonResponse
@@ -83,8 +96,8 @@ class SupportFormController extends AbstractController
     }
 
     #[Route(
-        path: '/api/_action/support-form/download_log',
-        name: 'api.action.support-form.download_log',
+        path: '/api/_action/worldline/support-form/download_log',
+        name: 'api.action.worldline.support-form.download_log',
         methods: ['POST']
     )]
     public function downloadLog(): JsonResponse
@@ -184,7 +197,7 @@ class SupportFormController extends AbstractController
                 $this->clearMedia($this->getDuplicateId(), $context);
                 $url = $this->getUrl($archivePath);
             }
-        } catch (\Exception $e) {
+        }  catch (\Exception $e) {
             $this->clearMedia($mediaId, $context);
         }
         return $url;
@@ -229,5 +242,30 @@ class SupportFormController extends AbstractController
             ->from('media', 'm')
             ->where("m.file_name = '$filename'");
         return $qb->fetchOne();
+    }
+
+    /**
+     * @param string $userId
+     * @return mixed
+     * @throws \Doctrine\DBAL\Exception
+     */
+    private function getUserEmail(string $userId): mixed
+    {
+        $connection = Kernel::getConnection();
+        $qb = $connection->createQueryBuilder();
+        $qb->select('u.email')
+            ->from('user', 'u')
+            ->where('u.id = UNHEX(:id)')
+            ->setParameter('id', $userId);
+        return $qb->fetchOne();
+    }
+
+    /**
+     * @param Context $context
+     * @return bool
+     */
+    private function isAllowedToCreateAnAccount(Context $context): bool
+    {
+        return $context->getSource()->isAllowed('user:create');
     }
 }

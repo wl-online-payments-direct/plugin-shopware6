@@ -24,9 +24,10 @@ use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
 class MoptWorldline extends Plugin
 {
     const PLUGIN_NAME = 'MoptWorldline';
-    const PLUGIN_VERSION = '2.2.4';
-    private const ENCRYPTION_INTRODUCED_VERSION = '2.2.4';
-
+    const PLUGIN_VERSION = '2.3.6';
+    const PLUGIN_ID = 'MoptWorldline';
+    const PLUGIN_CREATOR = 'Mediaopt GmbH';
+    private const ENCRYPTION_INTRODUCED_VERSION = '2.3.6';
 
     /**
      * @param InstallContext $installContext

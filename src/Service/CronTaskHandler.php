@@ -9,7 +9,6 @@ namespace MoptWorldline\Service;
 
 use MoptWorldline\Adapter\WorldlineSDKAdapter;
 use MoptWorldline\Bootstrap\Form;
-use MoptWorldline\Service\SecureConfigService;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\OrderStates;
 use Shopware\Core\Framework\Context;
@@ -18,6 +17,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 use Shopware\Core\Kernel;
 use Shopware\Core\System\StateMachine\StateMachineRegistry;
+use MoptWorldline\Service\SecureConfigService;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CronTaskHandler extends ScheduledTaskHandler

@@ -11,7 +11,6 @@ use Monolog\Level;
 use MoptWorldline\Adapter\WorldlineSDKAdapter;
 use MoptWorldline\Service\LogHelper;
 use MoptWorldline\Service\OrderHelper;
-use MoptWorldline\Service\SecureConfigService;
 use OnlinePayments\Sdk\Webhooks\InMemorySecretKeyStore;
 use OnlinePayments\Sdk\Webhooks\WebhooksHelper;
 use MoptWorldline\Service\PaymentHandler;
@@ -25,11 +24,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\RouterInterface;
+use MoptWorldline\Service\SecureConfigService;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * @Route(defaults={"_routeScope"={"storefront"}})
- */
+#[Route(defaults: ['_routeScope' => ['storefront']])]
 class PaymentWebhookController extends AbstractController
 {
     private RouterInterface $router;
@@ -63,16 +61,16 @@ class PaymentWebhookController extends AbstractController
     }
 
     /**
-     * @Route(
-     *     "/worldline/payment/webhook",
-     *     name="worldline.payment.webhook",
-     *     methods={"POST"}
-     * )
      * @param Request $request
      * @param SalesChannelContext $salesChannelContext
      * @return Response
      * @throws \Exception
      */
+    #[Route(
+        path: '/worldline/payment/webhook',
+        name: 'worldline.payment.webhook',
+        methods: ['POST']
+    )]
     public function webhook(Request $request, SalesChannelContext $salesChannelContext): Response
     {
         $data = $this->parseRequest($request, $salesChannelContext->getSalesChannelId());
@@ -107,7 +105,8 @@ class PaymentWebhookController extends AbstractController
         $logger->setTranslator($this->translator);
         $logger->paymentLog($order->getOrderNumber(), 'webhook', 0, $request->request->all());
 
-        $paymentHandler->updatePaymentStatus($data['hostedCheckoutId']);
+        $externalStatusCode = isset($data['statusCode']) ? (int)$data['statusCode'] : null;
+        $paymentHandler->updatePaymentStatus($data['hostedCheckoutId'], false, $externalStatusCode);
 
         return new Response();
     }

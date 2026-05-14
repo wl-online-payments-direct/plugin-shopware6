@@ -1,14 +1,16 @@
-# 2.2.4
+# 2.3.6
+- Update support form
 - Improved: Credentials management security
 
-# 2.2.3
-- Update support form
-
-# 2.2.2
+# 2.3.5
+- New payment methods: Bank Transfer, P24, Twint, Carte Bancaire, PostFinane
+- Shipping cost as separated parameter
 - Add default api endpoints (in case no endpoint is specified in config)
     - LIVE: https://payment.direct.worldline-solutions.com
     - SANDBOX: https://payment.preprod.direct.worldline-solutions.com
 - Plugin icon fix
+- Plugin csv fix
+- Automatic capture fix
 
 # 2.2.1
 - Webhook fix

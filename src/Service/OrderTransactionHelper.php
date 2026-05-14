@@ -11,7 +11,9 @@ use Monolog\Level;
 use MoptWorldline\Bootstrap\Form;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionDefinition;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Kernel;
 use Shopware\Core\System\StateMachine\StateMachineRegistry;
 use Shopware\Core\System\StateMachine\Transition;
 
@@ -43,7 +45,7 @@ class OrderTransactionHelper
      * @param OrderTransactionEntity $transaction
      * @return mixed
      */
-    public static function getWorldlinePaymentMethodId(OrderTransactionEntity $transaction): mixed
+    public static function getWorldlinePaymentMethodId(OrderTransactionEntity $transaction): string
     {
         $customFields = $transaction->getPaymentMethod()->getCustomFields();
 
@@ -51,10 +53,37 @@ class OrderTransactionHelper
             || !array_key_exists(Form::CUSTOM_FIELD_WORLDLINE_PAYMENT_METHOD_ID, $customFields)
             || empty($customFields[Form::CUSTOM_FIELD_WORLDLINE_PAYMENT_METHOD_ID])
         ) {
-            return self::getCustomFieldFromTransaction($transaction);
+            return (string)self::getCustomFieldFromTransaction($transaction);
         }
 
-        return $customFields[Form::CUSTOM_FIELD_WORLDLINE_PAYMENT_METHOD_ID];
+        return (string)$customFields[Form::CUSTOM_FIELD_WORLDLINE_PAYMENT_METHOD_ID];
+    }
+
+    /**
+     * @param string $orderTransactionId
+     * @return string
+     */
+    public static function getState(string $orderTransactionId): string
+    {
+        $connection = Kernel::getConnection();
+        $qb = $connection->createQueryBuilder();
+        $qb->select('sms.technical_name as name')
+            ->from('order_transaction', 'ot')
+            ->leftJoin('ot', 'state_machine_state', 'sms', 'sms.id = ot.state_id')
+            ->where("ot.id = UNHEX('$orderTransactionId')")
+            ->andWhere('ot.version_id = UNHEX(:liveVersion)')
+            ->setParameter('liveVersion', Defaults::LIVE_VERSION);
+
+        try {
+            $state = $qb->fetchAssociative();
+            if (is_array($state) && array_key_exists('name', $state)) {
+                return $state['name'];
+            }
+        } catch (\Exception $e) {
+            LogHelper::addLog(Level::Error, "Can't find state for transaction $orderTransactionId", $e->getMessage());
+        }
+
+        return '';
     }
 
     /**

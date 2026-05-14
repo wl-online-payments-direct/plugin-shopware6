@@ -10,7 +10,6 @@ namespace MoptWorldline\Controller\Api;
 use MoptWorldline\Adapter\WorldlineSDKAdapter;
 use MoptWorldline\Bootstrap\Form;
 use MoptWorldline\Service\Helper;
-use MoptWorldline\Service\SecureConfigService;
 use Shopware\Core\Content\Media\File\FileSaver;
 use Shopware\Core\Content\Media\MediaService;
 use Shopware\Core\Framework\Context;
@@ -20,12 +19,11 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use MoptWorldline\Service\SecureConfigService;
 use MoptWorldline\Controller\PaymentMethod\PaymentMethodController;
 
-/**
- * @Route(defaults={"_routeScope"={"api"}})
- */
-class ApiTestController extends AbstractController
+#[Route(defaults: ['_routeScope' => ['api']])]
+class PluginConfigController extends AbstractController
 {
     private SecureConfigService $secureConfigService;
     private EntityRepository $salesChannelRepository;
@@ -35,6 +33,8 @@ class ApiTestController extends AbstractController
     private EntityRepository $mediaRepository;
     private MediaService $mediaService;
     private FileSaver $fileSaver;
+    private EntityRepository $ruleRepository;
+    private EntityRepository $ruleConditionRepository;
 
     private array $credentialKeys = [
         'sandbox' => [
@@ -60,6 +60,8 @@ class ApiTestController extends AbstractController
      * @param EntityRepository $mediaRepository
      * @param MediaService $mediaService
      * @param FileSaver $fileSaver
+     * @param EntityRepository $ruleRepository
+     * @param EntityRepository $ruleConditionRepository
      */
     public function __construct(
         SecureConfigService $secureConfigService,
@@ -69,7 +71,9 @@ class ApiTestController extends AbstractController
         PluginIdProvider    $pluginIdProvider,
         EntityRepository    $mediaRepository,
         MediaService        $mediaService,
-        FileSaver           $fileSaver
+        FileSaver           $fileSaver,
+        EntityRepository    $ruleRepository,
+        EntityRepository    $ruleConditionRepository,
     )
     {
         $this->secureConfigService = $secureConfigService;
@@ -80,15 +84,15 @@ class ApiTestController extends AbstractController
         $this->mediaRepository = $mediaRepository;
         $this->mediaService = $mediaService;
         $this->fileSaver = $fileSaver;
+        $this->ruleRepository = $ruleRepository;
+        $this->ruleConditionRepository = $ruleConditionRepository;
     }
 
-    /**
-     * @Route(
-     *     "/api/_action/api-test/test-connection",
-     *     name="api.action.test.connection",
-     *     methods={"POST"}
-     * )
-     */
+    #[Route(
+        path: '/api/_action/worldline/api-test/test-connection',
+        name: 'api.action.worldline.test.connection',
+        methods: ['POST']
+    )]
     public function testConnection(Request $request, Context $context): JsonResponse
     {
         $configFormData = $request->request->all('сonfigData');
@@ -133,13 +137,11 @@ class ApiTestController extends AbstractController
         return $this->response($success, $message, $paymentMethods);
     }
 
-    /**
-     * @Route(
-     *     "/api/_action/api-test/savemethod",
-     *     name="api.action.test.savemethod",
-     *     methods={"POST"}
-     * )
-     */
+    #[Route(
+        path: '/api/_action/worldline/api-test/savemethod',
+        name: 'api.action.worldline.test.savemethod',
+        methods: ['POST']
+    )]
     public function saveMethod(Request $request, Context $context): JsonResponse
     {
         $paymentMethodController = $this->getPaymentMethodController();
@@ -162,7 +164,9 @@ class ApiTestController extends AbstractController
             $this->mediaRepository,
             $this->mediaService,
             $this->fileSaver,
-            $this->salesChannelRepository
+            $this->salesChannelRepository,
+            $this->ruleRepository,
+            $this->ruleConditionRepository,
         );
     }
 
