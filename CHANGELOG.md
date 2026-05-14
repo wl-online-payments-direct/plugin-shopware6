@@ -1,3 +1,12 @@
+# 3.2.9
+- Update support form
+- Improved: Credentials management security
+
+# 3.2.8
+- Switch status issue fix
+- Additional logs
+- Old orders processing command
+
 # 3.2.7
 - Improved: Credentials management security
 
