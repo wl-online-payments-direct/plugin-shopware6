@@ -101,6 +101,22 @@
             <defaultValue>false</defaultValue>
             <label>Use order number as merchant reference</label>
         </input-field>
+        <input-field type="bool">
+            <name>displayPaymentConfirmationPage</name>
+            <defaultValue>true</defaultValue>
+            <label>Display payment confirmation page</label>
+            <label lang="de-DE">Zahlungsbestätigungsseite anzeigen</label>
+            <label lang="fr-FR">Afficher la page de confirmation de paiement</label>
+            <label lang="nl-NL">Pagina met betalingsbevestiging weergeven</label>
+            <label lang="es-ES">Mostrar la página de confirmación de pago</label>
+            <label lang="it-IT">Mostra la pagina di conferma del pagamento</label>
+            <helpText>If enabled, customers will see a dedicated confirmation screen after payment is processed, confirming the payment and providing key details.</helpText>
+            <helpText lang="de-DE">Wenn aktiviert, sehen Kunden nach der Zahlungsabwicklung einen speziellen Bestätigungsbildschirm, der die Zahlung bestätigt und wichtige Details bereitstellt.</helpText>
+            <helpText lang="fr-FR">Si activé, les clients verront un écran de confirmation dédié après le traitement du paiement, confirmant le paiement et fournissant les informations clés.</helpText>
+            <helpText lang="nl-NL">Indien ingeschakeld, zien klanten een speciaal bevestigingsscherm nadat de betaling is verwerkt, dat de betaling bevestigt en belangrijke details verstrekt.</helpText>
+            <helpText lang="es-ES">Si está habilitado, los clientes verán una pantalla de confirmación dedicada después de procesar el pago, confirmando el pago y proporcionando detalles clave.</helpText>
+            <helpText lang="it-IT">Se abilitato, i clienti vedranno una schermata di conferma dedicata dopo l'elaborazione del pagamento, che conferma il pagamento e fornisce dettagli chiave.</helpText>
+        </input-field>
         <input-field type="single-select">
             <name>autoCapture</name>
             <label>Automatic capture</label>

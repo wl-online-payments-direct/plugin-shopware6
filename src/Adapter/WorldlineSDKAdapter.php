@@ -221,6 +221,9 @@ class WorldlineSDKAdapter
         $hostedCheckoutSpecificInput->setReturnUrl($returnUrl);
         $hostedCheckoutSpecificInput->setLocale(OrderHelper::getLocale($orderEntity));
         $hostedCheckoutSpecificInput->setVariant($fullRedirectTemplateName);
+        $configured = $this->getPluginConfig(Form::DISPLAY_PAYMENT_CONFIRMATION_PAGE);
+        $showResultPage = $configured === null ? true : (bool) $configured;
+        $hostedCheckoutSpecificInput->setShowResultPage($showResultPage);
         $cardPaymentMethodSpecificInput = new CardPaymentMethodSpecificInput();
         if ($this->isDirectSales()) {
             $cardPaymentMethodSpecificInput->setAuthorizationMode(Payment::DIRECT_SALE);

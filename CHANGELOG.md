@@ -1,3 +1,6 @@
+# 2.3.7
+- Added: Configuration option to skip the Worldline payment confirmation page
+
 # 2.3.6
 - Update support form
 - Improved: Credentials management security
