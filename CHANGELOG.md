@@ -1,3 +1,6 @@
+# 1.8.9
+- Added: Configuration option to skip the Worldline payment confirmation page
+
 # 1.8.8
 - Improved: Credentials management security
 

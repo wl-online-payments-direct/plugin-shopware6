@@ -194,6 +194,9 @@ class WorldlineSDKAdapter
         $returnUrl = $this->getReturnUrl();
         $hostedCheckoutSpecificInput->setReturnUrl($returnUrl);
         $hostedCheckoutSpecificInput->setVariant($fullRedirectTemplateName);
+        $configured = $this->getPluginConfig(Form::DISPLAY_PAYMENT_CONFIRMATION_PAGE);
+        $showResultPage = $configured === null ? true : (bool) $configured;
+        $hostedCheckoutSpecificInput->setShowResultPage($showResultPage);
         $cardPaymentMethodSpecificInput = new CardPaymentMethodSpecificInput();
         $captureConfig = $this->getPluginConfig(Form::AUTO_CAPTURE);
         if ($captureConfig === Form::AUTO_CAPTURE_IMMEDIATELY) {

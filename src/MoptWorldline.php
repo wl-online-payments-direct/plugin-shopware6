@@ -27,7 +27,7 @@ class MoptWorldline extends Plugin
 
     const PLUGIN_NAME = 'MoptWorldline';
 
-    const PLUGIN_VERSION = '1.8.8';
+    const PLUGIN_VERSION = '1.8.9';
     private const ENCRYPTION_INTRODUCED_VERSION = '1.8.8';
 
 
