@@ -1,1 +1,1 @@
-Built from Worldline-Plugins/worldline-plugin-shopware-6-PRE-RELEASE@master_66 on Thu May 14 12:32:09 UTC 2026
+Built from Worldline-Plugins/worldline-plugin-shopware-6-PRE-RELEASE@v3.2.10 on Wed Jun 17 13:00:36 UTC 2026

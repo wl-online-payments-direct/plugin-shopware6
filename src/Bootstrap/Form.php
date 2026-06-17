@@ -49,6 +49,8 @@ class Form
     const PARTIAL_OPERATIONS_ENABLED = 'MoptWorldline.config.partialOperationsEnabled';
     const BANK_TRANSFER_INSTANT_PAYMENT_FIELD = 'MoptWorldline.config.bankTransferInstantPayment';
     const ORDER_NUMBER_AS_REFERENCE_FIELD = 'MoptWorldline.config.orderNumberAsReference';
+    const DISPLAY_PAYMENT_CONFIRMATION_PAGE = 'MoptWorldline.config.displayPaymentConfirmationPage';
+
 
     /** @var string Fieldset name for the plugin custom field */
     const CUSTOM_FIELD_WORLDLINE_PAYMENT_TRANSACTION_FIELDSET = 'payment_transaction_fieldset';

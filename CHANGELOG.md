@@ -1,3 +1,6 @@
+# 3.2.10
+- Added: Configuration option to skip the Worldline payment confirmation page
+
 # 3.2.9
 - Update support form
 - Improved: Credentials management security
