@@ -137,7 +137,7 @@ class CronTaskHandler extends ScheduledTaskHandler
         }
 
         if ($timeInterval > 0) {
-            $qb->andWhere("UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(o.updated_at) > :timeInterval")
+            $qb->andWhere("TIMESTAMPDIFF(SECOND, o.updated_at, UTC_TIMESTAMP()) > :timeInterval")
                 ->setParameter('timeInterval', $timeInterval);
         }
 

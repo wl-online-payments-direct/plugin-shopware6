@@ -220,7 +220,7 @@ class ApiTestController extends AbstractController
             }
         }
 
-        if (!$credentials['endpoint']) {
+        if (empty($credentials['endpoint'])) {
             $credentials['endpoint'] = $mode === 'live' ? WorldlineSDKAdapter::LIVE_ENDPOINT : WorldlineSDKAdapter::TEST_ENDPOINT;
         }
         return $credentials;

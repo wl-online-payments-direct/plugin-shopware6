@@ -22,6 +22,8 @@ class PaymentProducts
           self::PAYMENT_PRODUCT_KLARNA_PAY_NOW,
           self::PAYMENT_PRODUCT_KLARNA_PAY_LATER,
     ];
+    // Public (web-served) path of the payment-product logos — used for display and stored
+    // token data. To read the source file for media import, use getMediaSourceDir() instead.
     public const PAYMENT_PRODUCT_MEDIA_DIR = 'bundles/moptworldline/static/img';
     private const PAYMENT_PRODUCT_MEDIA_PREFIX = 'pp_logo_';
     public const PAYMENT_PRODUCT_MEDIA_DEFAULT = 'base';
@@ -74,6 +76,15 @@ class PaymentProducts
             'title' => $title,
             'logo' => \sprintf('%s/%s.svg', self::PAYMENT_PRODUCT_MEDIA_DIR, $logoName),
             'fileName' => $logoName,
+            'extension' => 'svg',
         ];
+    }
+
+    public static function getMediaSourceDir(): string
+    {
+        // Logo source files ship with the plugin and are always on local disk,
+        // regardless of install method (zip: custom/plugins/..., composer: vendor/...).
+        // Flysystem/S3 only backs public//private/ storage, never the plugin's PHP code.
+        return \dirname(__DIR__) . '/Resources/public/static/img';
     }
 }

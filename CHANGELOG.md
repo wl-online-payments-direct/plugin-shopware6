@@ -1,3 +1,16 @@
+# 1.8.12
+- Fixed: Secure missing custom field when saving order custom fields
+- Fixed: Display iFrame on the checkout
+- Fixed: Enabling/disabling payment methods on the plugin configuration
+
+# 1.8.11
+- Fixed: Payment method logos failing to load on S3 (Flysystem) storage setups
+
+# 1.8.10
+- Fixed: Saving payment methods configuration in dev mode
+- Fixed: Displaying payment methods on the checkout
+- Fixed: Time zone inconsistency when cancelling old orders
+
 # 1.8.9
 - Added: Configuration option to skip the Worldline payment confirmation page
 
