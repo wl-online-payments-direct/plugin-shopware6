@@ -44,6 +44,8 @@ class PaymentProducts
         Payment::SAVED_CARD_PAYMENT_METHOD_ID,
         Payment::IFRAME_PAYMENT_METHOD_ID
     ];
+    // Public (web-served) path of the payment-product logos — used for display and stored
+    // token data. To read the source file for media import, use getMediaSourceDir() instead.
     public const PAYMENT_PRODUCT_MEDIA_DIR = 'bundles/moptworldline/static/img';
     private const PAYMENT_PRODUCT_MEDIA_PREFIX = 'pp_logo_';
     public const PAYMENT_PRODUCT_MEDIA_DEFAULT = 'base';
@@ -99,6 +101,14 @@ class PaymentProducts
         self::PAYMENT_PRODUCT_PRZELEWY24 => ['PLN'],
     ];
 
+    public static function getMediaSourceDir(): string
+    {
+        // Logo source files ship with the plugin and are always on local disk,
+        // regardless of install method (zip: custom/plugins/..., composer: vendor/...).
+        // Flysystem/S3 only backs public//private/ storage, never the plugin's PHP code.
+        return \dirname(__DIR__) . '/Resources/public/static/img';
+    }
+
     /**
      * @param int $paymentProductId
      * @return array
@@ -107,9 +117,9 @@ class PaymentProducts
     {
         $title = 'Unknown';
         $logoName = self::PAYMENT_PRODUCT_MEDIA_DEFAULT;
-        $format = '%s/%s.svg';
+        $extension = 'svg';
         if (in_array($paymentProductId, self::PAYMENT_PRODUCT_PNG_LOGO)) {
-            $format = '%s/%s.png';
+            $extension = 'png';
         }
         if (array_key_exists($paymentProductId, self::PAYMENT_PRODUCT_NAMES)) {
             $title = self::PAYMENT_PRODUCT_NAMES[$paymentProductId];
@@ -118,8 +128,9 @@ class PaymentProducts
 
         return [
             'title' => $title,
-            'logo' => \sprintf($format, self::PAYMENT_PRODUCT_MEDIA_DIR, $logoName),
+            'logo' => \sprintf('%s/%s.%s', self::PAYMENT_PRODUCT_MEDIA_DIR, $logoName, $extension),
             'fileName' => $logoName,
+            'extension' => $extension,
         ];
     }
 

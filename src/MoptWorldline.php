@@ -11,6 +11,8 @@ use MoptWorldline\Service\CredentialMigrationService;
 use MoptWorldline\Service\Payment;
 use MoptWorldline\Service\PaymentMethodHelper;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\UninstallContext;
@@ -24,7 +26,7 @@ use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
 class MoptWorldline extends Plugin
 {
     const PLUGIN_NAME = 'MoptWorldline';
-    const PLUGIN_VERSION = '3.2.10';
+    const PLUGIN_VERSION = '3.2.11';
     const PLUGIN_ID = 'MoptWorldline';
     const PLUGIN_CREATOR = 'Mediaopt GmbH';
     private const ENCRYPTION_INTRODUCED_VERSION = '3.2.7';
@@ -73,7 +75,14 @@ class MoptWorldline extends Plugin
     public function uninstall(UninstallContext $uninstallContext): void
     {
         parent::uninstall($uninstallContext);
-        $this->setPaymentMethodsStatus(false, $uninstallContext->getContext());
+
+        $context = $uninstallContext->getContext();
+
+        $this->setAllPluginPaymentMethodsStatus(false, $context);
+
+        if (!$uninstallContext->keepUserData()) {
+            $this->detachPluginPaymentMethodsFromSalesChannels($context);
+        }
     }
 
     /**
@@ -106,7 +115,7 @@ class MoptWorldline extends Plugin
     public function deactivate(DeactivateContext $deactivateContext): void
     {
         parent::deactivate($deactivateContext);
-        $this->setPaymentMethodsStatus(false, $deactivateContext->getContext());
+        $this->setAllPluginPaymentMethodsStatus(false, $deactivateContext->getContext());
     }
 
     /**
@@ -120,6 +129,75 @@ class MoptWorldline extends Plugin
         $paymentMethodRepository = $this->container->get('payment_method.repository');
         foreach (Payment::METHODS_LIST as $method) {
             PaymentMethodHelper::setPaymentMethodStatus($paymentMethodRepository, $status, $context, $method['id']);
+        }
+    }
+
+    /**
+     * Set active=$status on every payment_method row whose handler is owned by
+     * this plugin (handlerIdentifier = Payment::class). Covers both static
+     * methods from METHODS_LIST and dynamic ones added via the admin UI.
+     *
+     * @param bool $status
+     * @param Context $context
+     * @return void
+     */
+    private function setAllPluginPaymentMethodsStatus(bool $status, Context $context): void
+    {
+        /** @var EntityRepository $paymentMethodRepository */
+        $paymentMethodRepository = $this->container->get('payment_method.repository');
+
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('handlerIdentifier', Payment::class));
+
+        $methodIds = $paymentMethodRepository->searchIds($criteria, $context)->getIds();
+        if (empty($methodIds)) {
+            return;
+        }
+
+        $updates = [];
+        foreach ($methodIds as $methodId) {
+            $updates[] = ['id' => $methodId, 'active' => $status];
+        }
+
+        $paymentMethodRepository->update($updates, $context);
+    }
+
+    /**
+     * Delete sales_channel_payment_method join rows for every payment method
+     * this plugin owns. Called on uninstall when keepUserData() is false, so
+     * removed methods stop appearing in the storefront checkout list.
+     *
+     * @param Context $context
+     * @return void
+     */
+    private function detachPluginPaymentMethodsFromSalesChannels(Context $context): void
+    {
+        /** @var EntityRepository $paymentMethodRepository */
+        $paymentMethodRepository = $this->container->get('payment_method.repository');
+        /** @var EntityRepository $salesChannelPaymentRepository */
+        $salesChannelPaymentRepository = $this->container->get('sales_channel_payment_method.repository');
+
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('handlerIdentifier', Payment::class));
+        $methodIds = $paymentMethodRepository->searchIds($criteria, $context)->getIds();
+        if (empty($methodIds)) {
+            return;
+        }
+
+        $linkCriteria = new Criteria();
+        $linkCriteria->addFilter(new EqualsFilter('paymentMethodId', $methodIds));
+
+        $links = $salesChannelPaymentRepository->search($linkCriteria, $context);
+        $deletes = [];
+        foreach ($links as $link) {
+            $deletes[] = [
+                'paymentMethodId' => $link->getPaymentMethodId(),
+                'salesChannelId' => $link->getSalesChannelId(),
+            ];
+        }
+
+        if (!empty($deletes)) {
+            $salesChannelPaymentRepository->delete($deletes, $context);
         }
     }
 }

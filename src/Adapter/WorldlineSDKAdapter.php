@@ -126,6 +126,17 @@ class WorldlineSDKAdapter
             $credentials = $this->getCredentials();
         }
 
+        $missing = array_filter(
+            ['merchantId', 'apiKey', 'apiSecret'],
+            static fn(string $key) => empty($credentials[$key])
+        );
+        if ($missing) {
+            throw new \RuntimeException(sprintf(
+                'Cannot initialise Worldline SDK client — missing credentials: %s. Configure them in the plugin settings (Sandbox or Live section).',
+                implode(', ', $missing)
+            ));
+        }
+
         $shoppingCartExtension = new ShoppingCartExtension(
             MoptWorldline::PLUGIN_CREATOR,
             MoptWorldline::PLUGIN_NAME,
@@ -133,10 +144,15 @@ class WorldlineSDKAdapter
             MoptWorldline::PLUGIN_ID
         );
 
+        $endpoint = $credentials['endpoint'] ?? null;
+        if (empty($endpoint)) {
+            $endpoint = !empty($credentials['isLiveMode']) ? self::LIVE_ENDPOINT : self::TEST_ENDPOINT;
+        }
+
         $communicatorConfiguration = new CommunicatorConfiguration(
             $credentials['apiKey'],
             $credentials['apiSecret'],
-            $credentials['endpoint'] ?: ($credentials['isLiveMode'] ? self::LIVE_ENDPOINT : self::TEST_ENDPOINT),
+            $endpoint,
             self::INTEGRATOR_NAME . ' ' . MoptWorldline::PLUGIN_VERSION,
             null
         );
