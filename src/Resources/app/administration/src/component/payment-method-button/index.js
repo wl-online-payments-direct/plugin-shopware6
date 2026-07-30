@@ -96,6 +96,16 @@ Component.register('payment-method-button', {
                 }
 
                 this.isLoading = false;
+            }).catch((error) => {
+                const serverMessage = error?.response?.data?.errors?.[0]?.detail
+                    || error?.response?.data?.message
+                    || error?.message
+                    || '';
+                this.createNotificationError({
+                    title: this.$tc('worldline.payment-method-button.APITitle'),
+                    message: this.$tc('worldline.payment-method-button.errorAPI') + serverMessage
+                });
+                this.isLoading = false;
             });
 
         },

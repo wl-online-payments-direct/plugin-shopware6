@@ -611,6 +611,7 @@ class PaymentHandler
         }
 
         if (is_null($currentCustomField)
+            || !array_key_exists(Form::CUSTOM_FIELD_WORLDLINE_PAYMENT_TRANSACTION_STATUS, $currentCustomField)
             || $currentCustomField[Form::CUSTOM_FIELD_WORLDLINE_PAYMENT_TRANSACTION_STATUS] != (string)$statusCode
             || !empty($log)
             || !empty($amounts)

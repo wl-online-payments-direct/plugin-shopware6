@@ -84,12 +84,17 @@ class ReturnUrlController extends AbstractController
     public function getReturnUrl(WorldlineSDKAdapter $adapter, bool $isLiveMode): string
     {
         $server = $this->getServerUrl();
+
         if (empty($server)) {
-            if ($isLiveMode) {
-                $server = $adapter->getPluginConfig(Form::LIVE_MAIN_RETURN_SERVER_FIELD);
-            } else {
-                $server = $adapter->getPluginConfig(Form::MAIN_RETURN_SERVER_FIELD);
-            }
+            $configField = $isLiveMode ? Form::LIVE_MAIN_RETURN_SERVER_FIELD : Form::MAIN_RETURN_SERVER_FIELD;
+            $server = $adapter->getPluginConfig($configField);
+        }
+
+        if (empty($server) || !is_string($server)) {
+            throw new \RuntimeException(
+                'Worldline return URL could not be determined. Set "'
+                . ($isLiveMode ? 'Live' : 'Sandbox') . ' main return URL" in the plugin configuration.'
+            );
         }
 
         $server = trim(trim($server), '/');

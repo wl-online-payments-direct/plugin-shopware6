@@ -22,6 +22,7 @@ class MediaHelper
     const TEMP_NAME = 'image-import-from-url';
     const MEDIA_FOLDER = 'payment_method';
     const FILE_PREFIX = 'Worldline_logo ';
+    private const MIME_BY_EXTENSION = ['svg' => 'image/svg+xml', 'png' => 'image/png'];
 
     private EntityRepository $mediaRepository;
     private MediaService $mediaService;
@@ -58,7 +59,8 @@ class MediaHelper
         if ($productData['fileName'] === PaymentProducts::PAYMENT_PRODUCT_MEDIA_DEFAULT) {
             return $this->addImageToMediaFromURL($product->getDisplayHints()->getLogo(), $context);
         }
-        return $this->createMediaFromFile($productData['logo'], $productData['fileName'], 'svg', $context);
+        $logoPath = \sprintf('%s/%s.%s', PaymentProducts::getMediaSourceDir(), $productData['fileName'], $productData['extension']);
+        return $this->createMediaFromFile($logoPath, $productData['fileName'], $productData['extension'], $context);
     }
 
     /**
@@ -75,12 +77,40 @@ class MediaHelper
         $fileExtension = $filePathParts['extension'];
 
         if ($fileName && $fileExtension) {
-            $filePath = tempnam(sys_get_temp_dir(), self::TEMP_NAME);
-            file_put_contents($filePath, file_get_contents($imageUrl));
-            $mediaId = $this->createMediaFromFile($filePath, $fileName, $fileExtension, $context);
+            try {
+                $filePath = tempnam(sys_get_temp_dir(), self::TEMP_NAME);
+                if ($filePath === false) {
+                    throw new \RuntimeException('Could not create temporary file.');
+                }
+                $contents = @file_get_contents($imageUrl);
+                if ($contents === false) {
+                    throw new \RuntimeException(sprintf('Could not download logo from "%s".', $imageUrl));
+                }
+                if (@file_put_contents($filePath, $contents) === false) {
+                    throw new \RuntimeException(sprintf('Could not write logo to "%s".', $filePath));
+                }
+                $mediaId = $this->createMediaFromFile($filePath, $fileName, $fileExtension, $context);
+            } catch (\Throwable $e) {
+                LogHelper::addLog(Level::Error, $e->getMessage());
+            }
         }
 
         return $mediaId;
+    }
+
+    /**
+     * @param string $filePath
+     * @param string $fileExtension
+     * @return string|null
+     */
+    private function resolveMimeType(string $filePath, string $fileExtension): ?string
+    {
+        $mimeType = mime_content_type($filePath);
+        if ($mimeType !== false) {
+            return $mimeType;
+        }
+
+        return self::MIME_BY_EXTENSION[strtolower($fileExtension)] ?? null;
     }
 
     /**
@@ -94,10 +124,20 @@ class MediaHelper
     {
         $mediaId = null;
 
-        $fileSize = filesize($filePath);
-        $mimeType = mime_content_type($filePath);
-
         try {
+            if (!is_file($filePath) || !is_readable($filePath)) {
+                throw new \RuntimeException(sprintf('Logo file "%s" does not exist or is not readable.', $filePath));
+            }
+
+            $fileSize = filesize($filePath);
+            if ($fileSize === false) {
+                throw new \RuntimeException(sprintf('Could not read metadata for logo file "%s".', $filePath));
+            }
+            $mimeType = $this->resolveMimeType($filePath, $fileExtension);
+            if ($mimeType === null) {
+                throw new \RuntimeException(sprintf('Could not resolve MIME type for logo file "%s".', $filePath));
+            }
+
             $mediaFile = new MediaFile($filePath, $mimeType, $fileExtension, $fileSize);
             $mediaId = $this->mediaService->createMediaInFolder(self::MEDIA_FOLDER, $context, false);
             $this->fileSaver->persistFileToMedia(
@@ -106,9 +146,11 @@ class MediaHelper
                 $mediaId,
                 $context
             );
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             LogHelper::addLog(Level::Error, $e->getMessage());
-            $this->mediaRepository->delete([['id' => $mediaId]], $context);
+            if ($mediaId !== null) {
+                $this->mediaRepository->delete([['id' => $mediaId]], $context);
+            }
             $mediaId = null;
         }
 
@@ -142,7 +184,7 @@ class MediaHelper
      */
     private function createSystemLogo(string $logoName, string $paymentMethodId, Context $context): ?string
     {
-        $logoPath = \sprintf('%s/%s.png', PaymentProducts::PAYMENT_PRODUCT_MEDIA_DIR, $logoName);
+        $logoPath = \sprintf('%s/%s.png', PaymentProducts::getMediaSourceDir(), $logoName);
         $mediaId = $this->createMediaFromFile($logoPath, $logoName, 'png', $context);
 
         $paymentMethod = [

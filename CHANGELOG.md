@@ -1,3 +1,14 @@
+# 2.3.10
+- Fixed: Secure missing custom field when saving order custom fields
+
+# 2.3.9
+- Fixed: Payment method logos failing to load on S3 (Flysystem) storage setups
+
+# 2.3.8
+- Fixed: Saving payment methods configuration in dev mode
+- Fixed: Displaying payment methods on the checkout
+- Fixed: Time zone inconsistency when cancelling old orders
+
 # 2.3.7
 - Added: Configuration option to skip the Worldline payment confirmation page
 
