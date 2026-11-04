@@ -12,6 +12,7 @@ use MoptWorldline\Service\Payment;
 use MoptWorldline\Service\PaymentMethodHelper;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
@@ -26,7 +27,7 @@ use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
 class MoptWorldline extends Plugin
 {
     const PLUGIN_NAME = 'MoptWorldline';
-    const PLUGIN_VERSION = '3.2.11';
+    const PLUGIN_VERSION = '3.2.14';
     const PLUGIN_ID = 'MoptWorldline';
     const PLUGIN_CREATOR = 'Mediaopt GmbH';
     private const ENCRYPTION_INTRODUCED_VERSION = '3.2.7';
@@ -185,16 +186,11 @@ class MoptWorldline extends Plugin
         }
 
         $linkCriteria = new Criteria();
-        $linkCriteria->addFilter(new EqualsFilter('paymentMethodId', $methodIds));
+        $linkCriteria->addFilter(new EqualsAnyFilter('paymentMethodId', $methodIds));
 
-        $links = $salesChannelPaymentRepository->search($linkCriteria, $context);
-        $deletes = [];
-        foreach ($links as $link) {
-            $deletes[] = [
-                'paymentMethodId' => $link->getPaymentMethodId(),
-                'salesChannelId' => $link->getSalesChannelId(),
-            ];
-        }
+        // sales_channel_payment_method is a mapping definition: it cannot be loaded with search(),
+        // but searchIds() returns the {salesChannelId, paymentMethodId} key pairs delete() expects.
+        $deletes = array_values($salesChannelPaymentRepository->searchIds($linkCriteria, $context)->getIds());
 
         if (!empty($deletes)) {
             $salesChannelPaymentRepository->delete($deletes, $context);

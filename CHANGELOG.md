@@ -1,3 +1,8 @@
+### Changelog
+
+# 3.2.14
+- Fixed: Plugin uninstallation handling and payment method removal from sales channels
+
 # 3.2.13
 - Fixed: Secure missing custom field when saving order custom fields
 
