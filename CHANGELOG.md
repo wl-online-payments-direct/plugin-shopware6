@@ -1,5 +1,9 @@
 ### Changelog
 
+# 3.2.15
+- Changed: Plugin rebranding
+- Fixed: Plugin notifications and translations
+
 # 3.2.14
 - Fixed: Plugin uninstallation handling and payment method removal from sales channels
 

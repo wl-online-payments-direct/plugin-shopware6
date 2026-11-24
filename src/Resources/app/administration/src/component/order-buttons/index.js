@@ -133,8 +133,8 @@ Component.register('mo-order-buttons', {
                         }, 1000);
                     } else {
                         this.createNotificationError({
-                            title: this.$tc('worldline.refund-payment-button.title'),
-                            message: this.$tc('worldline.refund-payment-button.error') + res.message
+                            title: this.$tc('worldline.cancel-payment-button.title'),
+                            message: this.$tc('worldline.cancel-payment-button.error') + res.message
                         });
                     }
                 })
@@ -158,8 +158,8 @@ Component.register('mo-order-buttons', {
                         }, 1000);
                     } else {
                         this.createNotificationError({
-                            title: this.$tc('worldline.capture-payment-button.title'),
-                            message: this.$tc('worldline.capture-payment-button.error') + res.message
+                            title: this.$tc('worldline.refund-payment-button.title'),
+                            message: this.$tc('worldline.refund-payment-button.error') + res.message
                         });
                     }
                 })

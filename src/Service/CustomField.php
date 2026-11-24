@@ -19,6 +19,11 @@ use MoptWorldline\Bootstrap\Form;
 
 class CustomField
 {
+    private const ORDER_TRANSACTION_FIELDSET_LABEL = [
+        'de-DE' => 'Worldline Gopay Zahlungstransaktion',
+        'en-GB' => 'Worldline Gopay payment transaction'
+    ];
+
     private ContainerInterface $container;
 
     /**
@@ -45,6 +50,44 @@ class CustomField
         $customFieldSetRepository->upsert([
             $this->getOrderTransactionFieldset(),
         ], $installContext->getContext());
+    }
+
+    /**
+     * Brings the fieldset label of already existing installations in line with the current one.
+     * addCustomFields() skips existing fieldsets, so label changes would otherwise reach new shops only.
+     *
+     * @param Context $context
+     * @return void
+     */
+    public function updateFieldsetLabel(Context $context): void
+    {
+        $customFieldSetRepository = $this->container->get('custom_field_set.repository');
+
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsAnyFilter(
+            'name',
+            [
+                Form::CUSTOM_FIELD_WORLDLINE_PAYMENT_TRANSACTION_FIELDSET,
+            ]
+        ));
+
+        $updates = [];
+        foreach ($customFieldSetRepository->search($criteria, $context)->getEntities() as $fieldset) {
+            $config = $fieldset->getConfig() ?? [];
+            if (($config['label'] ?? null) == self::ORDER_TRANSACTION_FIELDSET_LABEL) {
+                continue;
+            }
+
+            $config['label'] = self::ORDER_TRANSACTION_FIELDSET_LABEL;
+            $updates[] = [
+                'id' => $fieldset->getId(),
+                'config' => $config,
+            ];
+        }
+
+        if ($updates) {
+            $customFieldSetRepository->update($updates, $context);
+        }
     }
 
     /**
@@ -77,10 +120,7 @@ class CustomField
             'id' => Uuid::randomHex(),
             'name' => Form::CUSTOM_FIELD_WORLDLINE_PAYMENT_TRANSACTION_FIELDSET,
             'config' => [
-                'label' => [
-                    'de-DE' => 'Worldline Zahlungstransaktions',
-                    'en-GB' => 'Worldline payment transaction'
-                ]
+                'label' => self::ORDER_TRANSACTION_FIELDSET_LABEL
             ],
             'customFields' => [
                 [

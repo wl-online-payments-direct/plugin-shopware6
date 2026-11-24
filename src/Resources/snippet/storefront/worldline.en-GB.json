@@ -70,7 +70,7 @@
         "failed": "Operation failed.",
         "worldline-order": {
             "detail": {
-                "cardLabel": "Worldline transaction control",
+                "cardLabel": "Worldline Gopay transaction control",
                 "bundleSelectLabel": "Associated bundles",
                 "bundleSelectPlaceholder": "Add bundle..."
             }
@@ -133,9 +133,9 @@
             "5_day": "In 5 days"
         },
         "composer": {
-            "label": "Worldline Online Payments.",
-            "description": "Worldline Online Payments.",
-            "extraDescription": "Certified Worldline online payments extension for Shopware 6"
+            "label": "Worldline Gopay",
+            "description": "Worldline Gopay",
+            "extraDescription": "Certified Worldline Gopay extension for Shopware 6"
         },
         "transaction-control": {
             "logs": {

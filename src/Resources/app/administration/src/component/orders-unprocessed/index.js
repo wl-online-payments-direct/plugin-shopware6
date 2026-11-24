@@ -77,6 +77,10 @@ Component.register('mo-orders-unprocessed', {
             return get(this.order, 'taxStatus', '');
         },
 
+        selectedLabel() {
+            return this.$tc('worldline.transaction-control.table.selected');
+        },
+
         unitPriceLabel() {
             return this.$tc('worldline.transaction-control.table.unitPrice');
         },
@@ -98,7 +102,7 @@ Component.register('mo-orders-unprocessed', {
             },{
                 property: 'unprocessed',
                 dataIndex: 'unprocessed',
-                label: 'worldline.transaction-control.table.selected',
+                label: this.selectedLabel,
                 allowResize: false,
                 align: 'right',
                 width: '150px',
