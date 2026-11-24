@@ -27,10 +27,11 @@ use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
 class MoptWorldline extends Plugin
 {
     const PLUGIN_NAME = 'MoptWorldline';
-    const PLUGIN_VERSION = '2.3.11';
+    const PLUGIN_VERSION = '2.3.12';
     const PLUGIN_ID = 'MoptWorldline';
     const PLUGIN_CREATOR = 'Mediaopt GmbH';
     private const ENCRYPTION_INTRODUCED_VERSION = '2.3.6';
+    private const REBRAND_INTRODUCED_VERSION = '2.3.12';
 
     /**
      * @param InstallContext $installContext
@@ -98,6 +99,11 @@ class MoptWorldline extends Plugin
         if (version_compare($updateContext->getCurrentPluginVersion(), self::ENCRYPTION_INTRODUCED_VERSION, '<')) {
             $migrationService = $this->container->get(CredentialMigrationService::class);
             $migrationService->migrate($updateContext->getContext());
+        }
+
+        if (version_compare($updateContext->getCurrentPluginVersion(), self::REBRAND_INTRODUCED_VERSION, '<')) {
+            $customField = new CustomField($this->container);
+            $customField->updateFieldsetLabel($updateContext->getContext());
         }
     }
 

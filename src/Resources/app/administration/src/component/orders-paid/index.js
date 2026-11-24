@@ -75,6 +75,10 @@ Component.register('mo-orders-paid', {
             return get(this.order, 'taxStatus', '');
         },
 
+        selectedLabel() {
+            return this.$tc('worldline.transaction-control.table.selected');
+        },
+
         unitPriceLabel() {
             return this.$tc('worldline.transaction-control.table.unitPrice');
         },
@@ -96,7 +100,7 @@ Component.register('mo-orders-paid', {
             }, {
                 property: 'refund',
                 dataIndex: 'paid',
-                label: 'worldline.transaction-control.table.selected',
+                label: this.selectedLabel,
                 allowResize: false,
                 align: 'right',
                 width: '150px',
@@ -158,8 +162,8 @@ Component.register('mo-orders-paid', {
                         }, 1000);
                     } else {
                         this.createNotificationError({
-                            title: this.$tc('worldline.capture-payment-button.title'),
-                            message: this.$tc('worldline.capture-payment-button.error') + res.message
+                            title: this.$tc('worldline.refund-payment-button.title'),
+                            message: this.$tc('worldline.refund-payment-button.error') + res.message
                         });
                     }
                 })

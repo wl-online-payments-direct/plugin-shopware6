@@ -1,7 +1,7 @@
 {
     "name": "mediaopt/worldline",
-    "description": "Worldline Online Payments",
-    "version": "2.3.11",
+    "description": "Worldline Gopay",
+    "version": "2.3.12",
     "type": "shopware-platform-plugin",
     "license": "proprietary",
     "config": {
@@ -10,19 +10,19 @@
     },
     "authors": [
         {
-            "name": "Mediaopt"
+            "name": "Worldline Gopay"
         }
     ],
     "extra": {
         "shopware-plugin-class": "MoptWorldline\\MoptWorldline",
         "copyright": "(c) by Mediaopt GmbH",
         "label": {
-            "de-DE": "Worldline Online Payments",
-            "en-GB": "Worldline Online Payments"
+            "de-DE": "Worldline Gopay",
+            "en-GB": "Worldline Gopay"
         },
         "description": {
-            "de-DE": "Zertifiziertes Worldline online Zahlungs-plugin für Shopware 6",
-            "en-GB": "Certified Worldline online payments extension for Shopware 6"
+            "de-DE": "Zertifiziertes Worldline Gopay Plugin für Shopware 6",
+            "en-GB": "Certified Worldline Gopay extension for Shopware 6"
         },
         "manufacturerLink": {
             "de-DE": "https://www.mediaopt.de/",
